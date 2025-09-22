@@ -3,13 +3,13 @@ import 'package:get/get.dart';
 import '../../../../core/base/base_controller.dart';
 import '../../../../core/network/services/auth_storage_service.dart';
 import '../../../../core/services/get_user_profile_service.dart';
+import '../../../home/presentation/screens/home_screen.dart';
 import '../../data/models/login_request_model.dart';
 import '../../data/models/otp_request_model.dart';
 import '../../data/models/refresh_token_request_model.dart';
 import '../../data/models/reset_password_request_model.dart';
 import '../../data/models/set_new_password_request_model.dart';
 import '../../domain/repo/auth_repo.dart';
-import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/otp_verification_screen.dart';
 import '../screens/set_new_password_screen.dart';
@@ -39,22 +39,20 @@ class AuthController extends BaseController {
       },
       (success) async {
         final user = success.data.user;
-        if(user.role == 'manager'){
+        if (user.role == 'manager') {
           await _authStorageService.storeAuthData(
             accessToken: success.data.accessToken,
             refreshToken: success.data.refreshToken,
             userId: success.data.user.id,
           );
           Get.to(HomeScreen());
-        }
-        else {
+        } else {
           setError(success.message);
         }
         setLoading(false);
       },
     );
   }
-
 
   Future resetPass(String email) async {
     setLoading(true);
@@ -118,7 +116,6 @@ class AuthController extends BaseController {
       },
     );
   }
-
 
   Future setNewPass(String email, String otp, String newPassword) async {
     setLoading(true);
