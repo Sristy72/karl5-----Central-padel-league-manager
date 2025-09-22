@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_karlfive223_manager/features/team_confirmation/team_confirmation_screen.dart';
 import 'package:get/get.dart';
-
 import 'core/init/app_initializer.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/screens/splash_screen.dart';

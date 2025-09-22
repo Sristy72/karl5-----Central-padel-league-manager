@@ -23,6 +23,10 @@ class ApiConstants {
   static AuthEndpoints get auth => AuthEndpoints();
   static UserEndpoints get user => UserEndpoints();
   static NotificationEndpoints get notification => NotificationEndpoints();
+
+  static get team => null;
+
+  static get league => null;
 }
 
 /// [Authentication Endpoints]

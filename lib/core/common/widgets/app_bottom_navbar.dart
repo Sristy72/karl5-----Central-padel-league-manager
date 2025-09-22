@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../features/home/presentation/screens/home_screen.dart';
 import '../../../features/league/presentation/screens/leagues_screen.dart';
+import '../../../features/notification/presentation/screen/notification_dummy_screen.dart';
+import '../../../features/team_members_profile/models/team_member_model.dart';
+import '../../../features/team_members_profile/presentation/screens/profile_info_screen.dart';
 
 // Create a GetX controller for navigation
 class BottomNavController extends GetxController {
@@ -85,28 +88,26 @@ class AppBottomNavBar extends StatelessWidget {
               Get.to(
                 () => const HomeScreen(),
                 transition: Transition.fadeIn,
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 200),
               );
             } else if (index == 1) {
               Get.to(
                 () => const LeaguesScreen(),
                 transition: Transition.fadeIn,
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 200),
               );
             } else if (index == 2) {
-              Text('Notifications Screen');
-              // Get.to(
-              //   () => NotificationScreen(),
-              //   transition: Transition.fadeIn,
-              //   duration: const Duration(milliseconds: 300),
-              // );
+              Get.to(
+                () => NotificationScreen(),
+                transition: Transition.fadeIn,
+                duration: const Duration(milliseconds: 200),
+              );
             } else if (index == 3) {
-              Text('Profile Screen');
-              // Get.to(
-              //   () => ProfileInfoScreen(member: dummyMember),
-              //   transition: Transition.fadeIn,
-              //   duration: const Duration(milliseconds: 300),
-              // );
+              Get.to(
+                () => ProfileInfoScreen(member: dummyMember),
+                transition: Transition.fadeIn,
+                duration: const Duration(milliseconds: 200),
+              );
             }
           },
           backgroundColor: Colors.transparent,
