@@ -43,18 +43,21 @@ class FixturesTab extends StatelessWidget {
             padding: const EdgeInsets.only(
               left: 21,
               right: 21,
-              top: 18,
+              top: 24,
               bottom: 12,
             ),
             child: Container(height: 2, color: AppColors.gray),
           ),
 
-          const Text(
-            'Fixtures',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: const Text(
+              'Fixtures',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
 

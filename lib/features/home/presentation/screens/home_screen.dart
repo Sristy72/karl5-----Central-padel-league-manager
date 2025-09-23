@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../join_league/presentation/screens/form_screen/join_league_screen.dart';
+
 import '../../controller/home_controller.dart';
 import '../widgets/custom_search_bar.dart';
 import '../widgets/fixtures_widget.dart';
@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                 backgroundColor: Colors.grey[850],
                 child: IconButton(
                   onPressed: () {
-                    Get.to(() => JoinLeagueScreen());
+                    // Get.to(() => JoinLeagueScreen());
                   },
                   icon: const Icon(Icons.add, color: Colors.white),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_karlfive223_manager/core/theme/app_colors.dart';
 import 'package:get/get.dart';
 import '../controllers/league_details_controller.dart';
 
@@ -28,7 +29,8 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
-    // initialize controller for this league
+
+    //* initialize controller for this league
     Get.put(
       LeagueDetailsController(
         repository: Get.find(),
@@ -46,6 +48,7 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.leaguTabsBackground,
       appBar: CustomLeagueAppbar(
         leagueName: widget.league.leagueName,
         leagueLogoPath: widget.league.leagueLogo.isNotEmpty

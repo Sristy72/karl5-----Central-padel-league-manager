@@ -29,7 +29,7 @@ class _MatchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: AppColors.primaryBackground,
+      color: AppColors.leaguTabsBackground,
       margin: const EdgeInsets.only(bottom: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
       child: Padding(
@@ -117,7 +117,7 @@ class _MatchCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
-            color: AppColors.primaryBackground,
+            color: AppColors.teamCardBackground,
             borderRadius: BorderRadius.circular(4),
           ),
           child: (logoPath.startsWith('http') || logoPath.startsWith('https'))
