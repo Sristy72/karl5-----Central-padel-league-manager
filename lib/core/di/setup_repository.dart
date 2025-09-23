@@ -8,6 +8,8 @@ import '../../features/league/data/team_repository.dart';
 import '../../features/league/data/team_repository_impl.dart';
 import '../../features/league/data/league_repository.dart';
 import '../../features/league/data/league_repository_impl.dart';
+import '../../features/Create_league/data/create_league_repository.dart';
+import '../../features/Create_league/data/create_league_repository_impl.dart';
 
 void setupRepository() {
   Get.lazyPut<AuthRepository>(() => AuthRepositoryImpl(apiClient: Get.find()));
@@ -16,6 +18,15 @@ void setupRepository() {
   Get.lazyPut<LeagueRepository>(
     () => LeagueRepositoryImpl(apiClient: Get.find()),
   );
+
+  // Create League repository
+  Get.lazyPut<CreateLeagueRepository>(
+    () => CreateLeagueRepositoryImpl(apiClient: Get.find()),
+  );
+  Get.lazyPut<JoinLeagueRepository>(
+    () => JoinLeagueRepositoryImpl(apiClient: Get.find()),
+  );
+
   // Team repository used by League features (delete team, etc.)
   Get.lazyPut<TeamRepository>(() => TeamRepositoryImpl(apiClient: Get.find()));
 }
