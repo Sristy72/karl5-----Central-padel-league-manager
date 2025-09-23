@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
 import '../../models/team_model.dart';
 import '../../domain/repo/team_repository.dart';
+import '../../data/team_repository_impl.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class TeamsTab extends StatefulWidget {
@@ -23,7 +25,17 @@ class _TeamsTabState extends State<TeamsTab> {
   void initState() {
     super.initState();
     _teams = List<Team>.from(widget.teamsData);
-    _repo = Get.find<TeamRepository>();
+    // Resolve repository; if not registered (ordering/hot-reload issue),
+    // register a fallback implementation using the global ApiClient.
+    try {
+      _repo = Get.find<TeamRepository>();
+    } catch (_) {
+      final apiClient = Get.find<ApiClient>();
+      Get.lazyPut<TeamRepository>(
+        () => TeamRepositoryImpl(apiClient: apiClient),
+      );
+      _repo = Get.find<TeamRepository>();
+    }
   }
 
   @override
