@@ -6,10 +6,10 @@ import 'team_repository.dart';
 class TeamRepositoryImpl implements TeamRepository {
   final ApiClient _apiClient;
 
-  TeamRepositoryImpl(ApiClient apiClient, {required ApiClient apiclient}) : _apiClient = apiClient;
+  TeamRepositoryImpl(this._apiClient);
 
   @override
-  NetworkResult<Map<String, dynamic>> deleteTeam(String id) {
+  Future<NetworkResult<Map<String, dynamic>>> deleteTeam(String id) async {
     final endpoint = '${ApiConstants.baseUrl}/team/$id';
     return _apiClient.delete<Map<String, dynamic>>(
       endpoint,

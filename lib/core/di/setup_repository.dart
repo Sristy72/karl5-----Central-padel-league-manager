@@ -1,4 +1,4 @@
-import 'package:flutter_karlfive223_manager/features/league/domain/repo/team_repository.dart';
+import 'package:flutter_karlfive223_manager/features/league/data/team_repository.dart';
 import 'package:get/get.dart';
 
 import '../../features/auth/data/repo/auth_repo_impl.dart';
@@ -17,5 +17,5 @@ void setupRepository() {
     () => LeagueRepositoryImpl(apiClient: Get.find()),
   );
   // Team repository used by League features (delete team, etc.)
-  Get.lazyPut<TeamRepository>(() => TeamRepositoryImpl(apiClient: Get.find()));
+  Get.lazyPut<TeamRepository>(() => TeamRepositoryImpl(Get.find()));
 }

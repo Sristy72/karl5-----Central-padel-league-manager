@@ -30,9 +30,7 @@ class _TeamsTabState extends State<TeamsTab> {
       _repo = Get.find<TeamRepository>();
     } catch (_) {
       final apiClient = Get.find<ApiClient>();
-      Get.lazyPut<TeamRepository>(
-        () => TeamRepositoryImpl(apiClient, apiclient: apiClient),
-      );
+      Get.lazyPut<TeamRepository>(() => TeamRepositoryImpl(apiClient));
       _repo = Get.find<TeamRepository>();
     }
   }
@@ -170,19 +168,53 @@ class _TeamsTabState extends State<TeamsTab> {
                                     final result = await _repo.deleteTeam(
                                       team.id,
                                     );
-                                    result.fold(
-                                      (fail) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Delete failed: ${fail.message}',
-                                            ),
-                                          ),
+
+                                    // handle result in a safe, runtime-checked way
+                                    final res = result;
+                                    bool handled = false;
+                                    try {
+                                      // If the result implements fold (e.g. Either-like), use it
+                                      final foldFn = (res as dynamic).fold;
+                                      if (foldFn is Function) {
+                                        (res as dynamic).fold(
+                                          (fail) {
+                                            final msg =
+                                                (fail as dynamic)?.message ??
+                                                'Delete failed';
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(content: Text(msg)),
+                                            );
+                                          },
+                                          (success) {
+                                            setState(() {
+                                              _teams.removeAt(index);
+                                            });
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Team deleted'),
+                                              ),
+                                            );
+                                          },
                                         );
-                                      },
-                                      (success) {
+                                        handled = true;
+                                      }
+                                    } catch (_) {
+                                      // ignore and fallback below
+                                    }
+
+                                    if (!handled) {
+                                      // Fallback: common NetworkResult shapes
+                                      final dyn = res as dynamic;
+                                      final bool success =
+                                          (dyn.data != null) ||
+                                          (dyn.isSuccess == true) ||
+                                          (dyn.status == 'success');
+
+                                      if (success) {
                                         setState(() {
                                           _teams.removeAt(index);
                                         });
@@ -193,8 +225,20 @@ class _TeamsTabState extends State<TeamsTab> {
                                             content: Text('Team deleted'),
                                           ),
                                         );
-                                      },
-                                    );
+                                      } else {
+                                        final msg =
+                                            dyn.message ??
+                                            dyn.error?.message ??
+                                            'Delete failed';
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(msg.toString()),
+                                          ),
+                                        );
+                                      }
+                                    }
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.all(6.0),
