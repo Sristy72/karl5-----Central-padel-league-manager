@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
 import '../../models/team_model.dart';
-import '../../../join_league/domain/repo/team_repo.dart';
+import '../../domain/repo/team_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class TeamsTab extends StatefulWidget {
@@ -17,13 +17,13 @@ class TeamsTab extends StatefulWidget {
 class _TeamsTabState extends State<TeamsTab> {
   late List<Team> _teams;
   final isEditMode = false.obs;
-  // Use JoinLeagueRepository to call delete; injected via Get if available
-  final _repo = Get.find<JoinLeagueRepository>();
+  late final TeamRepository _repo;
 
   @override
   void initState() {
     super.initState();
     _teams = List<Team>.from(widget.teamsData);
+    _repo = Get.find<TeamRepository>();
   }
 
   @override
@@ -64,7 +64,11 @@ class _TeamsTabState extends State<TeamsTab> {
                   children: [
                     if (isEditMode.value)
                       IconButton(
-                        icon: const Icon(Icons.add, color: Colors.white),
+                        icon: const Image(
+                          height: 22,
+                          width: 22,
+                          image: AssetImage("assets/images/add_icon.png"),
+                        ),
                         tooltip: "Add Team",
                         onPressed: () {
                           // TODO: Navigate to Add Team screen or show dialog
@@ -72,8 +76,12 @@ class _TeamsTabState extends State<TeamsTab> {
                         },
                       ),
                     IconButton(
-                      icon: Icon(
-                        isEditMode.value ? Icons.close : Icons.edit,
+                      icon: Image(
+                        height: 22,
+                        width: 22,
+                        image: isEditMode.value
+                            ? AssetImage("assets/images/cross_icon.png")
+                            : AssetImage("assets/images/edit_icon.png"),
                         color: Colors.white,
                       ),
                       tooltip: isEditMode.value ? "Done" : "Edit",
