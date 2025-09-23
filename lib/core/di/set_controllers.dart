@@ -7,7 +7,10 @@ import '../../features/home/data/home_repository.dart';
 void setupController() {
   // Auth Controller
   Get.lazyPut<AuthController>(() => AuthController(Get.find(), Get.find()));
-  Get.lazyPut<LeagueController>(() => LeagueController(repository: Get.find()));
+  Get.lazyPut<LeagueController>(
+    fenix: true,
+    () => LeagueController(repository: Get.find()),
+  );
   // Home controller depends on HomeRepository
   Get.lazyPut<HomeController>(
     () => HomeController(repository: Get.find<HomeRepository>()),

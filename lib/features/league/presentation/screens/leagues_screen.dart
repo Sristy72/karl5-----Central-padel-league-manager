@@ -9,7 +9,7 @@ class LeaguesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LeagueController controller = Get.find<LeagueController>();
+    final controller = Get.find<LeagueController>();
 
     return Scaffold(
       body: Obx(() {

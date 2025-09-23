@@ -12,21 +12,33 @@ import '../../features/Create_league/data/create_league_repository.dart';
 import '../../features/Create_league/data/create_league_repository_impl.dart';
 
 void setupRepository() {
-  Get.lazyPut<AuthRepository>(() => AuthRepositoryImpl(apiClient: Get.find()));
+  Get.lazyPut<AuthRepository>(
+    fenix: false,
+    () => AuthRepositoryImpl(apiClient: Get.find()),
+  );
   // Home repository used by HomeController and related features
-  Get.lazyPut<HomeRepository>(() => HomeRepositoryImpl(apiClient: Get.find()));
+  Get.lazyPut<HomeRepository>(
+    fenix: false,
+    () => HomeRepositoryImpl(apiClient: Get.find()),
+  );
   Get.lazyPut<LeagueRepository>(
+    fenix: true,
     () => LeagueRepositoryImpl(apiClient: Get.find()),
   );
 
   // Create League repository
   Get.lazyPut<CreateLeagueRepository>(
+    fenix: false,
     () => CreateLeagueRepositoryImpl(apiClient: Get.find()),
   );
-  Get.lazyPut<JoinLeagueRepository>(
-    () => JoinLeagueRepositoryImpl(apiClient: Get.find()),
+  Get.lazyPut<CreateLeagueRepository>(
+    fenix: false,
+    () => CreateLeagueRepositoryImpl(apiClient: Get.find()),
   );
 
   // Team repository used by League features (delete team, etc.)
-  Get.lazyPut<TeamRepository>(() => TeamRepositoryImpl(apiClient: Get.find()));
+  Get.lazyPut<TeamRepository>(
+    fenix: false,
+    () => TeamRepositoryImpl(apiClient: Get.find()),
+  );
 }

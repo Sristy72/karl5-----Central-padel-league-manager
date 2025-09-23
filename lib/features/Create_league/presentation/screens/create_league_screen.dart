@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_karlfive223_manager/features/notification/presentation/screen/notification_dummy_screen.dart'
+    show NotificationScreen;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 
 import '../controllers/create_league_controller.dart' as api_ctrl;
 import '../../data/create_league_repository.dart';
 import '../../data/models/create_league_model.dart' as form_model;
 import '../../data/models/create_league_request_model.dart';
-
 
 class CreateLeagueScreen extends StatefulWidget {
   const CreateLeagueScreen({super.key});
@@ -19,11 +19,15 @@ class CreateLeagueScreen extends StatefulWidget {
 
 class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   final api_ctrl.CreateLeagueController apiController = Get.put(
-    api_ctrl.CreateLeagueController(repository: Get.find<CreateLeagueRepository>()),
+    api_ctrl.CreateLeagueController(
+      repository: Get.find<CreateLeagueRepository>(),
+    ),
   );
 
   // form controller for teams list
-  final form_model.CreateLeagueFormController formController = Get.put(form_model.CreateLeagueFormController());
+  final form_model.CreateLeagueFormController formController = Get.put(
+    form_model.CreateLeagueFormController(),
+  );
 
   // simple text controllers for required fields
   final TextEditingController _leagueNameController = TextEditingController();
@@ -89,7 +93,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
               onTap: () {
-
+                Get.to(() => NotificationScreen());
               },
               child: Image.asset(
                 "assets/icons/notification.png",
@@ -114,32 +118,59 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                 children: [
                   // Create League Button
                   SizedBox(
-                      width: 103,
-                      height: 29,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          padding: EdgeInsets.zero,
+                    width: 103,
+                    height: 29,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
-                          "Create League +",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: const Text(
+                        "Create League +",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
+                  ),
                   // const SizedBox(width: 8),
 
                   // Update Score Button
                   SizedBox(
-                      width: 90,
+                    width: 90,
+                    height: 29,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        // side: const BorderSide(color: Colors.white),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: const Text(
+                        "Update score",
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // const SizedBox(width: 8),
+
+                  // Send Announcements Button
+                  Expanded(
+                    child: SizedBox(
+                      width: 133,
                       height: 29,
                       child: ElevatedButton(
                         onPressed: () {},
@@ -152,7 +183,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                           padding: EdgeInsets.zero,
                         ),
                         child: const Text(
-                          "Update score",
+                          "Send announcements",
                           style: TextStyle(
                             color: Colors.black38,
                             fontSize: 12,
@@ -161,33 +192,6 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                         ),
                       ),
                     ),
-                  // const SizedBox(width: 8),
-
-                  // Send Announcements Button
-                  Expanded(
-                    child: SizedBox(
-                      width: 133,
-                        height: 29,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            // side: const BorderSide(color: Colors.white),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: const Text(
-                            "Send announcements",
-                            style: TextStyle(
-                              color: Colors.black38,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
                   ),
                 ],
               ),
@@ -198,11 +202,19 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
 
       // body
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 13,left: 24, right: 24, bottom: 24),
+        padding: const EdgeInsets.only(
+          top: 13,
+          left: 24,
+          right: 24,
+          bottom: 24,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTextField("Enter League Name", controller: _leagueNameController),
+            _buildTextField(
+              "Enter League Name",
+              controller: _leagueNameController,
+            ),
 
             const SizedBox(height: 8),
 
@@ -212,7 +224,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
               fixedHeight: 183,
               controller: _descriptionController,
             ),
-            const SizedBox(height: 16 ),
+            const SizedBox(height: 16),
 
             // // Dropdown
             // DropdownButtonFormField<String>(
@@ -328,9 +340,19 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
 
             Row(
               children: [
-                Expanded(child: _buildTextField("Start Date", controller: _startDateController)),
+                Expanded(
+                  child: _buildTextField(
+                    "Start Date",
+                    controller: _startDateController,
+                  ),
+                ),
                 const SizedBox(width: 18),
-                Expanded(child: _buildTextField("End Date", controller: _endDateController)),
+                Expanded(
+                  child: _buildTextField(
+                    "End Date",
+                    controller: _endDateController,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -545,8 +567,6 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   TextSpan(
                     text:
                         "   • Best of 3 sets: First to win 2 sets wins the match \n     (scores: 2–0 or 2–1).\n\n",
-
-
                   ),
                   TextSpan(
                     text: "2. Tiebreak Options\n",
@@ -576,41 +596,41 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
             const SizedBox(height: 43),
 
             // Publish Button
-           Row(
-             mainAxisAlignment: MainAxisAlignment.end,
-             children: [
-               SizedBox(
-                    width: 116,
-                    height: 29,
-                    child: ElevatedButton(
-                      onPressed: _onCreatePressed,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        padding: EdgeInsets.zero,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 116,
+                  height: 29,
+                  child: ElevatedButton(
+                    onPressed: _onCreatePressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Obx(
-                        () => apiController.isLoading.value
-                            ? const SizedBox(
-                                height: 16,
-                                width: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text(
-                                "Publish",
-                                style: TextStyle(
-                                  color: Color(0xFF141414),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: Obx(
+                      () => apiController.isLoading.value
+                          ? const SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text(
+                              "Publish",
+                              style: TextStyle(
+                                color: Color(0xFF141414),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
-                      ),
+                            ),
                     ),
                   ),
-             ],
-           ),
+                ),
+              ],
+            ),
 
             const SizedBox(height: 100),
           ],
@@ -620,7 +640,12 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   }
 
   // Reusable TextField
-  Widget _buildTextField(String hint, {int maxLines = 1, double? fixedHeight, TextEditingController? controller}) {
+  Widget _buildTextField(
+    String hint, {
+    int maxLines = 1,
+    double? fixedHeight,
+    TextEditingController? controller,
+  }) {
     return SizedBox(
       height: fixedHeight ?? (maxLines > 1 ? null : 48),
       child: TextField(
@@ -708,26 +733,26 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
         ),
         child: file == null
             ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/icons/Report_drop_photo.png',
-              width: 17,
-              height: 17,
-              color: Colors.white,
-            ),
-            const SizedBox(height: 7),
-            const Text(
-              "Drop your files here",
-              style: TextStyle(color: Colors.white, fontSize: 8),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "Choose File",
-              style: TextStyle(color: Colors.white, fontSize: 8),
-            ),
-          ],
-        )
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/icons/Report_drop_photo.png',
+                    width: 17,
+                    height: 17,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 7),
+                  const Text(
+                    "Drop your files here",
+                    style: TextStyle(color: Colors.white, fontSize: 8),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Choose File",
+                    style: TextStyle(color: Colors.white, fontSize: 8),
+                  ),
+                ],
+              )
             : Image.file(file, fit: BoxFit.cover, width: double.infinity),
       ),
     );
@@ -751,7 +776,9 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       startDate: _startDateController.text,
       endDate: _endDateController.text,
       location: _locationController.text,
-      addTeams: formController.teamList.map((e) => e.map((k, v) => MapEntry(k, v))).toList(),
+      addTeams: formController.teamList
+          .map((e) => e.map((k, v) => MapEntry(k, v)))
+          .toList(),
       totalGameWeeks: 0,
       type: 'Singles',
       matchFormat: 'Best of 3 sets',
@@ -761,9 +788,17 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
 
     final success = await apiController.createLeague(request);
     if (success) {
-      Get.snackbar('Success', apiController.successMessage.value, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Success',
+        apiController.successMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } else {
-      Get.snackbar('Error', apiController.errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        apiController.errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }
