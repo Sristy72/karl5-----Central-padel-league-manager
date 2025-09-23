@@ -18,12 +18,12 @@ class Match {
   final String id;
   final Team teamOne;
   final Team teamTwo;
-  final DateTime matchDateTime;
+  DateTime matchDateTime;
   final String matchStatus;
   final List<SetScore> sets;
   final Team? winnerTeam;
-  final String venueName;
-  final String leagueName;
+  String venueName;
+  String leagueName;
   final String leagueId;
 
   Match({
@@ -90,6 +90,24 @@ class Match {
         b++;
     }
     return '$a - $b';
+  }
+
+  //* helper: update sets based on score text like '2 - 1'
+  void updateScore(String scoreText) {
+    final cleaned = scoreText.replaceAll(' ', '');
+    final parts = cleaned.split('-');
+    if (parts.length != 2) return;
+    final a = int.tryParse(parts[0]) ?? 0;
+    final b = int.tryParse(parts[1]) ?? 0;
+
+    // Clear and populate sets accordingly.
+    sets.clear();
+    for (var i = 0; i < a; i++) {
+      sets.add(SetScore(teamOneGames: 1, teamTwoGames: 0));
+    }
+    for (var i = 0; i < b; i++) {
+      sets.add(SetScore(teamOneGames: 0, teamTwoGames: 1));
+    }
   }
 
   /// helper: per-set breakdown like '2-1, 3-0'
