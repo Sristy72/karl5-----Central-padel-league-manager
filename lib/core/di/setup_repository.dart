@@ -1,10 +1,10 @@
-import 'package:flutter_karlfive223_manager/features/league/domain/repo/team_repository.dart';
 import 'package:get/get.dart';
 
 import '../../features/auth/data/repo/auth_repo_impl.dart';
 import '../../features/auth/domain/repo/auth_repo.dart';
 import '../../features/home/data/home_repository.dart';
 import '../../features/home/data/home_repository_impl.dart';
+import '../../features/league/data/team_repository.dart';
 import '../../features/league/data/team_repository_impl.dart';
 import '../../features/league/data/league_repository.dart';
 import '../../features/league/data/league_repository_impl.dart';

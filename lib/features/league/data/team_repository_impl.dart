@@ -1,7 +1,7 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/constants/api_constants.dart';
 import '../../../core/network/network_result.dart';
-import '../domain/repo/team_repository.dart';
+import 'team_repository.dart';
 
 class TeamRepositoryImpl implements TeamRepository {
   final ApiClient _apiClient;
