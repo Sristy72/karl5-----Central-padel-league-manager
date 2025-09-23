@@ -1,7 +1,7 @@
 // Controller using GetX
 import 'package:get/get.dart';
 
-class CreateLeagueController extends GetxController {
+class CreateLeagueFormController extends GetxController {
   var teamList = <Map<String, String>>[].obs;
 
   void addTeam() {
