@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'core/init/app_initializer.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/screens/splash_screen.dart';
+import 'features/team_confirmation/presentation/screens/team_confirmation_screen.dart';
 
 void main() async {
   await AppInitializer.initializeApp();
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'KarlFive Manager',
       theme: AppTheme.dark,
-      home: SplashScreen(),
+      home: TeamConfirmationScreen(),
     );
   }
 }
