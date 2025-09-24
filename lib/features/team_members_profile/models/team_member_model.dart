@@ -30,14 +30,12 @@ class TeamMemberModel {
   });
 }
 
-
 // Dummy member data (Future API)
 final TeamMemberModel dummyMember = TeamMemberModel(
   id: "1",
-  name: "Ken Adams",
+  name: "Niloy Shams",
   role: "Batsman",
   imageUrl: "assets/images/profile.png",
   matches: 0,
   level: 1,
 );
-

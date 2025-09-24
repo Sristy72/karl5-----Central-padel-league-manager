@@ -169,7 +169,7 @@ class ProfileInfoScreen extends StatelessWidget {
                           ),
                           const Spacer(),
                           Text(
-                            'asbd@gmail.com',
+                            'niloyshams21@gmail.com',
                             style: const TextStyle(color: Colors.white),
                           ),
                         ],
