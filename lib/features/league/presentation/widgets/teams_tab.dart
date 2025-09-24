@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:flutx_core/flutx_core.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
 import '../../data/team_repository.dart';
 import '../../models/team_model.dart';
@@ -164,6 +166,24 @@ class _TeamsTabState extends State<TeamsTab> {
                                       ),
                                     );
                                     if (confirm != true) return;
+
+                                    //* Ensure access token is fresh before delete
+                                    try {
+                                      final apiClient = Get.find<ApiClient>();
+                                      final refreshed = await apiClient
+                                          .refreshAuth();
+                                      if (kDebugMode) {
+                                        print(
+                                          'Refresh result before deleteTeam: $refreshed',
+                                        );
+                                      }
+                                    } catch (e) {
+                                      if (kDebugMode) {
+                                        DPrint.log(
+                                          'No ApiClient found to refresh: $e',
+                                        );
+                                      }
+                                    }
 
                                     // Call delete API
                                     final result = await _repo.deleteTeam(

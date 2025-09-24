@@ -100,8 +100,9 @@ class ApiClient {
         return false;
       }
 
+      // ApiConstants.auth.refreshToken already contains the full path
       final response = await _dio.post(
-        '${ApiConstants.baseUrl}${ApiConstants.auth.refreshToken}',
+        ApiConstants.auth.refreshToken,
         data: {'refreshToken': refreshToken},
       );
 
@@ -148,6 +149,7 @@ class ApiClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
     bool isFormData = false,
+    int retryCount = 0,
   }) async {
     final connectivityCheck = await _checkConnectivity();
     if (connectivityCheck.isLeft()) {
@@ -223,10 +225,56 @@ class ApiClient {
         onReceiveProgress: onReceiveProgress,
       );
 
-      if (kDebugMode) DPrint.log("☁️  BASE Response -> ${response.data}");
+      if (kDebugMode) {
+        DPrint.log("☁️  BASE Response -> ${response.data}");
+        DPrint.log('Response status: ${response.statusCode}');
+        DPrint.log('Response headers: ${response.headers.map}');
+        try {
+          DPrint.log(
+            'Outgoing request headers: ${response.requestOptions.headers}',
+          );
+        } catch (e) {
+          DPrint.log('Could not get request headers: $e');
+        }
+      }
 
       final baseResponse = BaseResponse<T>.fromJson(response.data, fromJsonT);
+
       if (!baseResponse.success) {
+        // If server responded with an authorization-like message but didn't send 401,
+        // attempt to refresh token once and retry the request.
+        final messageLower = baseResponse.message.toLowerCase();
+        final looksLikeAuthError =
+            messageLower.contains('not authorized') ||
+            messageLower.contains('you are not authorized') ||
+            messageLower.contains('authentication') ||
+            messageLower.contains('unauthorized');
+
+        if (looksLikeAuthError && retryCount == 0) {
+          if (kDebugMode)
+            DPrint.log(
+              'Server message indicates auth error; attempting token refresh and retry',
+            );
+          final refreshed = await _refreshToken();
+          if (refreshed) {
+            if (kDebugMode)
+              DPrint.log('Token refreshed successfully, retrying request');
+            return _request<T>(
+              method: method,
+              endpoint: endpoint,
+              fromJsonT: fromJsonT,
+              data: data,
+              queryParameters: queryParameters,
+              options: options,
+              cancelToken: cancelToken,
+              onSendProgress: onSendProgress,
+              onReceiveProgress: onReceiveProgress,
+              isFormData: isFormData,
+              retryCount: retryCount + 1,
+            );
+          }
+        }
+
         return Left(
           ServerFailure(
             message: baseResponse.combinedErrorMessage,
@@ -491,4 +539,9 @@ class ApiClient {
 
   /// Get connectivity service instance
   ConnectivityService get connectivityService => _connectivityService;
+
+  /// Public helper to force a token refresh. Returns true if refreshed.
+  Future<bool> refreshAuth() async {
+    return await _refreshToken();
+  }
 }
