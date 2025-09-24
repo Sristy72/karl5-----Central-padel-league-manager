@@ -1,55 +1,227 @@
 import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
+import 'package:get/get.dart';
+// import 'package:get/get_connect/http/src/utils/utils.dart';
+import '../../data/team_repository.dart';
 import '../../models/team_model.dart';
+import '../../data/team_repository_impl.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
 
-class TeamsTab extends StatelessWidget {
+class TeamsTab extends StatefulWidget {
   final List<Team> teamsData;
 
   const TeamsTab({super.key, required this.teamsData});
 
   @override
+  State<TeamsTab> createState() => _TeamsTabState();
+}
+
+class _TeamsTabState extends State<TeamsTab> {
+  late List<Team> _teams;
+  final isEditMode = false.obs;
+  late final TeamRepository _repo;
+
+  @override
+  void initState() {
+    super.initState();
+    _teams = List<Team>.from(widget.teamsData);
+    // Resolve repository; if not registered (ordering/hot-reload issue),
+    // register a fallback implementation using the global ApiClient.
+    try {
+      _repo = Get.find<TeamRepository>();
+    } catch (_) {
+      final apiClient = Get.find<ApiClient>();
+      Get.lazyPut<TeamRepository>(
+        () => TeamRepositoryImpl(apiClient: apiClient),
+      );
+      _repo = Get.find<TeamRepository>();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            "Teams",
-            style: TextStyle(
-              color: AppColors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
+    final screenWidth = MediaQuery.of(context).size.width;
+    return Obx(() {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 21,
+              right: 21,
+              top: 24,
+              bottom: 12,
             ),
+            child: Container(height: 2, color: AppColors.gray),
           ),
-        ),
-        SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24),
-            child: Column(
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                    childAspectRatio: 1.1,
+                SizedBox(width: screenWidth * 0.1),
+                Expanded(
+                  child: Text(
+                    isEditMode.value ? "Edit Teams" : "Teams",
+                    style: const TextStyle(
+                      color: AppColors.teamCardBackground,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center, // Center the text
                   ),
-                  itemCount: teamsData.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final team = teamsData[index];
-                    return _TeamGridItem(team: team);
-                  },
                 ),
-                _buildSeeTableButton(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (isEditMode.value)
+                      IconButton(
+                        icon: const Image(
+                          height: 22,
+                          width: 22,
+                          image: AssetImage("assets/images/add_icon.png"),
+                        ),
+                        tooltip: "Add Team",
+                        onPressed: () {
+                          // TODO: Navigate to Add Team screen or show dialog
+                          // Get.to(() => AddTeamScreen());
+                        },
+                      ),
+                    IconButton(
+                      icon: Image(
+                        height: 22,
+                        width: 22,
+                        image: isEditMode.value
+                            ? AssetImage("assets/images/cross_icon.png")
+                            : AssetImage("assets/images/edit_icon.png"),
+                        color: Colors.white,
+                      ),
+                      tooltip: isEditMode.value ? "Done" : "Edit",
+                      onPressed: () {
+                        isEditMode.value = !isEditMode.value;
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-        ),
-      ],
-    );
+
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12.0,
+                  horizontal: 24,
+                ),
+                child: Column(
+                  children: [
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 8.0,
+                            mainAxisSpacing: 8.0,
+                            childAspectRatio: 1.1,
+                          ),
+                      itemCount: _teams.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final team = _teams[index];
+                        return Stack(
+                          children: [
+                            _TeamGridItem(team: team),
+                            if (isEditMode.value)
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: InkWell(
+                                  onTap: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text(
+                                          'Delete team',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                        content: const Text(
+                                          'Are you sure you want to delete this team?',
+                                          style: TextStyle(
+                                            color: AppColors.white,
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(ctx).pop(false),
+                                            child: const Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(ctx).pop(true),
+                                            child: const Text('Delete'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    if (confirm != true) return;
+
+                                    // Call delete API
+                                    final result = await _repo.deleteTeam(
+                                      team.id,
+                                    );
+                                    result.fold(
+                                      (fail) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Delete failed: ${fail.message}',
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      (success) {
+                                        setState(() {
+                                          _teams.removeAt(index);
+                                        });
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Team deleted'),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: const Image(
+                                      image: AssetImage(
+                                        'assets/images/cross_icon_black.png',
+                                      ),
+                                      width: 10,
+                                      height: 10,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                    _buildSeeTableButton(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildSeeTableButton() {
@@ -58,8 +230,8 @@ class TeamsTab extends StatelessWidget {
         // Get.to(() => const YourNextScreen());
       },
       style: TextButton.styleFrom(
-        backgroundColor: Color(0xFF353535), // Text color
-        side: const BorderSide(width: 0), // Black border
+        backgroundColor: const Color(0xFF353535),
+        side: const BorderSide(width: 0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -85,8 +257,10 @@ class _TeamGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 100,
+      width: 100,
       decoration: BoxDecoration(
-        color: AppColors.primaryBackground,
+        color: AppColors.googleBorderColor,
         borderRadius: BorderRadius.circular(2),
       ),
       child: Column(

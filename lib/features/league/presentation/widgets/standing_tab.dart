@@ -16,8 +16,8 @@ class StandingTab extends StatelessWidget {
           child: DataTable(
             columnSpacing: 12.0,
             horizontalMargin: 12,
-            headingRowColor: MaterialStateProperty.all(Colors.black),
-            dataRowColor: MaterialStateProperty.all(const Color(0xFFE2E2E2)),
+            headingRowColor: WidgetStateProperty.all(Colors.black),
+            dataRowColor: WidgetStateProperty.all(const Color(0xFFE2E2E2)),
             border: const TableBorder(
               horizontalInside: BorderSide(color: Colors.black, width: 10),
             ),
