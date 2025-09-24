@@ -3,6 +3,7 @@ import '../../../../core/network/services/auth_storage_service.dart';
 import '../../data/create_league_repository.dart';
 import '../../data/models/create_league_request_model.dart';
 import '../../../auth/presentation/controller/auth_controller.dart';
+import '../../data/models/league_model.dart';
 
 class CreateLeagueController extends GetxController {
   final CreateLeagueRepository repository;
@@ -12,6 +13,7 @@ class CreateLeagueController extends GetxController {
   var isLoading = false.obs;
   var successMessage = ''.obs;
   var errorMessage = ''.obs;
+  var league = Rxn<LeagueModel>();
 
   Future<bool> createLeague(CreateLeagueRequestModel request) async {
     isLoading(true);
@@ -81,5 +83,29 @@ class CreateLeagueController extends GetxController {
       isLoading(false);
       return true;
     });
+  }
+
+  /// Load league details by id and store in [league]
+  Future<bool> loadLeagueById(String id) async {
+    isLoading(true);
+    errorMessage('');
+    successMessage('');
+    try {
+      final result = await repository.getLeagueById(id);
+      return result.fold((failure) {
+        errorMessage(failure.message);
+        isLoading(false);
+        return false;
+      }, (success) {
+        // success.data is CreateLeagueResponseModel; its .data is LeagueModel?
+        league.value = success.data.data;
+        isLoading(false);
+        return true;
+      });
+    } catch (e) {
+      errorMessage('Failed to load league');
+      isLoading(false);
+      return false;
+    }
   }
 }

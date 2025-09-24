@@ -4,4 +4,5 @@ import 'models/create_league_request_model.dart';
 
 abstract class CreateLeagueRepository {
   NetworkResult<CreateLeagueResponseModel> createLeague(CreateLeagueRequestModel request);
+  NetworkResult<CreateLeagueResponseModel> getLeagueById(String id);
 }
