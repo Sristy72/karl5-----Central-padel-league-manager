@@ -13,12 +13,12 @@ import '../../features/Create_league/data/create_league_repository_impl.dart';
 
 void setupRepository() {
   Get.lazyPut<AuthRepository>(
-    fenix: false,
+    fenix: true,
     () => AuthRepositoryImpl(apiClient: Get.find()),
   );
   // Home repository used by HomeController and related features
   Get.lazyPut<HomeRepository>(
-    fenix: false,
+    fenix: true,
     () => HomeRepositoryImpl(apiClient: Get.find()),
   );
   Get.lazyPut<LeagueRepository>(
@@ -28,17 +28,17 @@ void setupRepository() {
 
   // Create League repository
   Get.lazyPut<CreateLeagueRepository>(
-    fenix: false,
+    fenix: true,
     () => CreateLeagueRepositoryImpl(apiClient: Get.find()),
   );
   Get.lazyPut<CreateLeagueRepository>(
-    fenix: false,
+    fenix: true,
     () => CreateLeagueRepositoryImpl(apiClient: Get.find()),
   );
 
   // Team repository used by League features (delete team, etc.)
   Get.lazyPut<TeamRepository>(
-    fenix: false,
+    fenix: true,
     () => TeamRepositoryImpl(apiClient: Get.find()),
   );
 }
