@@ -28,7 +28,10 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
         _selectedLeague = _leagueCtrl!.leagues.first;
         // Only show teams that are pending confirmation
         _teams = List<Team>.from(
-            _selectedLeague!.addTeams.where((t) => t.applicationStatus == 'pending'));
+          _selectedLeague!.addTeams.where(
+            (t) => t.applicationStatus == 'pending',
+          ),
+        );
       }
       // listen for changes to leagues and update selection if needed
       ever(_leagueCtrl!.leagues, (_) {
@@ -36,7 +39,10 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
           setState(() {
             _selectedLeague = _leagueCtrl!.leagues.first;
             _teams = List<Team>.from(
-                _selectedLeague!.addTeams.where((t) => t.applicationStatus == 'pending'));
+              _selectedLeague!.addTeams.where(
+                (t) => t.applicationStatus == 'pending',
+              ),
+            );
           });
         }
       });
@@ -47,14 +53,15 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
     setState(() {
       _selectedLeague = league;
       _teams = league != null
-          ? List<Team>.from(league.addTeams.where((t) => t.applicationStatus == 'pending'))
+          ? List<Team>.from(
+              league.addTeams.where((t) => t.applicationStatus == 'pending'),
+            )
           : [];
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -103,7 +110,10 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
                     if (_selectedLeague == null && list.isNotEmpty) {
                       _selectedLeague = list.first;
                       _teams = List<Team>.from(
-                          _selectedLeague!.addTeams.where((t) => t.applicationStatus == 'pending'));
+                        _selectedLeague!.addTeams.where(
+                          (t) => t.applicationStatus == 'pending',
+                        ),
+                      );
                     }
                     return DropdownButtonHideUnderline(
                       child: DropdownButton<League>(
