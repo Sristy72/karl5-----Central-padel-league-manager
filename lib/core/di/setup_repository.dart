@@ -39,6 +39,6 @@ void setupRepository() {
   // Team repository used by League features (delete team, etc.)
   Get.lazyPut<TeamRepository>(
     fenix: true,
-    () => TeamRepositoryImpl(apiClient: Get.find()),
+    () => TeamRepositoryImpl(apiclient: Get.find()),
   );
 }
