@@ -1,19 +1,22 @@
+import 'league_model.dart';
+
 class CreateLeagueResponseModel {
   final bool success;
   final String message;
-  final Map<String, dynamic> data;
+  final LeagueModel? data;
 
   CreateLeagueResponseModel({
     required this.success,
     required this.message,
-    required this.data,
+    this.data,
   });
 
   factory CreateLeagueResponseModel.fromJson(Map<String, dynamic> json) {
+    final dataJson = json['data'] as Map<String, dynamic>?;
     return CreateLeagueResponseModel(
       success: json['success'] as bool? ?? false,
       message: json['message'] as String? ?? '',
-      data: json['data'] as Map<String, dynamic>? ?? {},
+      data: dataJson != null ? LeagueModel.fromJson(dataJson) : null,
     );
   }
 }

@@ -5,7 +5,7 @@ class CreateLeagueRequestModel {
   final String startDate;
   final String endDate;
   final String location;
-  final List<Map<String, dynamic>> addTeams;
+  final List<dynamic> addTeams;
   final int totalGameWeeks;
   final String type;
   final String matchFormat;
@@ -19,7 +19,7 @@ class CreateLeagueRequestModel {
     required this.startDate,
     required this.endDate,
     required this.location,
-    required this.addTeams,
+  required this.addTeams,
     required this.totalGameWeeks,
     required this.type,
     required this.matchFormat,
@@ -34,7 +34,7 @@ class CreateLeagueRequestModel {
         'startDate': startDate,
         'endDate': endDate,
         'location': location,
-        'addTeams': addTeams,
+  'addTeams': addTeams,
         'totalGameWeeks': totalGameWeeks,
         'type': type,
         'matchFormat': matchFormat,

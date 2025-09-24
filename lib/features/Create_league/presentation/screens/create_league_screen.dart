@@ -31,6 +31,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _entryfeeController = TextEditingController();
 
   File? _logoImage;
   File? _bannerImage;
@@ -336,6 +337,20 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
             const SizedBox(height: 8),
             _buildTextField("Location", controller: _locationController),
 
+
+            const SizedBox(height: 20),
+            const Text(
+              "Add Entry Fee",
+              style: TextStyle(
+                color: Color(0xFFD7D7D7),
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+            _buildTextField("Write here", controller: _entryfeeController),
+
             const SizedBox(height: 24),
 
             // Type
@@ -619,6 +634,43 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Check for league id in Get.arguments to load existing league
+    final args = Get.arguments;
+    String? leagueId;
+    if (args is String) {
+      leagueId = args;
+    } else if (args is Map && args['leagueId'] != null) {
+      leagueId = args['leagueId'] as String?;
+    }
+
+    if (leagueId != null && leagueId.isNotEmpty) {
+      // load league and populate fields
+      apiController.loadLeagueById(leagueId).then((success) {
+        if (success && apiController.league.value != null) {
+          final l = apiController.league.value!;
+          _leagueNameController.text = l.leagueName;
+          _descriptionController.text = l.description;
+          // use ISO date strings for inputs; format as yyyy-MM-dd for readability
+          if (l.startDate != null) _startDateController.text = l.startDate!.toIso8601String();
+          if (l.endDate != null) _endDateController.text = l.endDate!.toIso8601String();
+          _locationController.text = l.location;
+          if (l.price != null) _entryfeeController.text = l.price!;
+
+          // populate team list using ids as names (backend returns ids)
+          formController.teamList.assignAll(
+            l.addTeams.map((id) => {"name": id, "contact": ""}).toList(),
+          );
+          setState(() {});
+        } else {
+          Get.snackbar('Error', apiController.errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+        }
+      });
+    }
+  }
+
   // Reusable TextField
   Widget _buildTextField(String hint, {int maxLines = 1, double? fixedHeight, TextEditingController? controller}) {
     return SizedBox(
@@ -751,7 +803,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       startDate: _startDateController.text,
       endDate: _endDateController.text,
       location: _locationController.text,
-      addTeams: formController.teamList.map((e) => e.map((k, v) => MapEntry(k, v))).toList(),
+      addTeams: formController.teamList.map((e) => e['name'] ?? '').toList(),
       totalGameWeeks: 0,
       type: 'Singles',
       matchFormat: 'Best of 3 sets',

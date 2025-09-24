@@ -18,4 +18,12 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
       fromJsonT: (json) => CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
     );
   }
+
+  @override
+  NetworkResult<CreateLeagueResponseModel> getLeagueById(String id) {
+    return _apiClient.get<CreateLeagueResponseModel>(
+      '${ApiConstants.baseUrl}/league/$id',
+      fromJsonT: (json) => CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
 }
