@@ -4,13 +4,13 @@ import 'package:flutter_karlfive223_manager/features/league/presentation/control
 import 'package:flutter_karlfive223_manager/features/league/models/league_model.dart';
 import 'package:flutter_karlfive223_manager/features/league/models/team_model.dart';
 import '../widgets/team_row_widget.dart';
-import '../../../../core/theme/app_colors.dart';
+// removed unused import: app_colors
 
 class TeamConfirmationScreen extends StatefulWidget {
   const TeamConfirmationScreen({super.key});
 
   @override
-  _TeamConfirmationScreenState createState() => _TeamConfirmationScreenState();
+  State<TeamConfirmationScreen> createState() => _TeamConfirmationScreenState();
 }
 
 class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
@@ -26,14 +26,17 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
       _leagueCtrl = Get.find<LeagueController>();
       if (_leagueCtrl!.leagues.isNotEmpty) {
         _selectedLeague = _leagueCtrl!.leagues.first;
-        _teams = List<Team>.from(_selectedLeague!.addTeams);
+        // Only show teams that are pending confirmation
+        _teams = List<Team>.from(
+            _selectedLeague!.addTeams.where((t) => t.applicationStatus == 'pending'));
       }
       // listen for changes to leagues and update selection if needed
       ever(_leagueCtrl!.leagues, (_) {
         if (_selectedLeague == null && _leagueCtrl!.leagues.isNotEmpty) {
           setState(() {
             _selectedLeague = _leagueCtrl!.leagues.first;
-            _teams = List<Team>.from(_selectedLeague!.addTeams);
+            _teams = List<Team>.from(
+                _selectedLeague!.addTeams.where((t) => t.applicationStatus == 'pending'));
           });
         }
       });
@@ -43,13 +46,14 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
   void _onLeagueSelected(League? league) {
     setState(() {
       _selectedLeague = league;
-      _teams = league != null ? List<Team>.from(league.addTeams) : [];
+      _teams = league != null
+          ? List<Team>.from(league.addTeams.where((t) => t.applicationStatus == 'pending'))
+          : [];
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final leagues = _leagueCtrl?.leagues ?? <League>[].obs;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -95,10 +99,11 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
                         style: TextStyle(color: Colors.green),
                       );
                     }
-                    // ensure selected is valid
+                    // ensure selected is valid and only pending teams
                     if (_selectedLeague == null && list.isNotEmpty) {
                       _selectedLeague = list.first;
-                      _teams = List<Team>.from(_selectedLeague!.addTeams);
+                      _teams = List<Team>.from(
+                          _selectedLeague!.addTeams.where((t) => t.applicationStatus == 'pending'));
                     }
                     return DropdownButtonHideUnderline(
                       child: DropdownButton<League>(
@@ -186,12 +191,20 @@ class _TeamConfirmationScreenState extends State<TeamConfirmationScreen> {
                 : ListView.builder(
                     itemCount: _teams.length,
                     itemBuilder: (context, index) {
+                      final team = _teams[index];
                       return TeamRowWidget(
-                        team: _teams[index],
+                        team: team,
                         onDeleted: () {
                           setState(() {
-                            _teams.removeAt(index);
+                            _teams.removeWhere((t) => t.id == team.id);
                           });
+                        },
+                        onStatusUpdated: (status) {
+                          if (status == 'approved') {
+                            setState(() {
+                              _teams.removeWhere((t) => t.id == team.id);
+                            });
+                          }
                         },
                       );
                     },

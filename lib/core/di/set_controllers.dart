@@ -3,6 +3,7 @@ import '../../features/auth/presentation/controller/auth_controller.dart';
 import '../../features/league/presentation/controllers/league_controller.dart';
 import '../../features/home/controller/home_controller.dart';
 import '../../features/home/data/home_repository.dart';
+import '../../features/team_confirmation/presentation/controllers/team_confirmation_controller.dart';
 
 void setupController() {
   // Auth Controller
@@ -12,4 +13,6 @@ void setupController() {
   Get.lazyPut<HomeController>(
     () => HomeController(repository: Get.find<HomeRepository>()),
   );
+  // Team confirmation controller
+  Get.lazyPut<TeamConfirmationController>(() => TeamConfirmationController());
 }
