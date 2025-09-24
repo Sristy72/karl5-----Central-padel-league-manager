@@ -50,4 +50,13 @@ class HomeRepositoryImpl implements HomeRepository {
           (json as List).map((e) => league_model.League.fromJson(e)).toList(),
     );
   }
+
+  @override
+  NetworkResult<Map<String, dynamic>> deleteMatch(String matchId) {
+    final endpoint = '${ApiConstants.baseUrl}/match/$matchId';
+    return apiClient.delete<Map<String, dynamic>>(
+      endpoint,
+      fromJsonT: (json) => json as Map<String, dynamic>,
+    );
+  }
 }

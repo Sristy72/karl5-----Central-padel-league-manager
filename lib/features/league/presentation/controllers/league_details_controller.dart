@@ -78,4 +78,11 @@ class LeagueDetailsController extends GetxController {
       isLoadingMatches.value = false;
     }
   }
+
+  void removeMatch(Match match) {
+    matches.removeWhere((m) => m.id == match.id);
+    if (matches.isEmpty) {
+      matchesError.value = 'No matches to show!';
+    }
+  }
 }

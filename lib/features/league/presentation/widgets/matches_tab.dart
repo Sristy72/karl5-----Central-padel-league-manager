@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/match_model.dart';
+import '../../models/team_model.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 
@@ -38,6 +39,7 @@ class _MatchCardState extends State<_MatchCard> {
   late TextEditingController _scoreController;
   late DateTime _selectedDateTime;
   String? _selectedLeague;
+  Team? _selectedWinner;
 
   @override
   void initState() {
@@ -48,6 +50,18 @@ class _MatchCardState extends State<_MatchCard> {
     );
     _selectedDateTime = widget.match.matchDateTime;
     _selectedLeague = widget.match.leagueName;
+    // Normalize winner reference to one of the team objects if ids match
+    if (widget.match.winnerTeam != null) {
+      if (widget.match.winnerTeam!.id == widget.match.teamOne.id) {
+        _selectedWinner = widget.match.teamOne;
+      } else if (widget.match.winnerTeam!.id == widget.match.teamTwo.id) {
+        _selectedWinner = widget.match.teamTwo;
+      } else {
+        _selectedWinner = widget.match.winnerTeam;
+      }
+    } else {
+      _selectedWinner = null;
+    }
   }
 
   @override
@@ -116,6 +130,8 @@ class _MatchCardState extends State<_MatchCard> {
                         widget.match.matchDateTime = _selectedDateTime;
                         widget.match.updateScore(_scoreController.text);
                         widget.match.leagueName = _selectedLeague ?? '';
+                        // Persist winner selection
+                        widget.match.winnerTeam = _selectedWinner;
                       }
                       _isEditing = !_isEditing;
                     });
@@ -287,7 +303,24 @@ class _MatchCardState extends State<_MatchCard> {
             ),
 
             _isEditing
-                ? const SizedBox.shrink()
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: DropdownButtonFormField<Team?>(
+                      dropdownColor: Colors.black87,
+                      value: _selectedWinner,
+                      items: [widget.match.teamOne, widget.match.teamTwo]
+                          .map(
+                            (t) => DropdownMenuItem<Team?>(
+                              value: t,
+                              child: Text(t.teamName, style: const TextStyle(color: Colors.white)),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (val) => setState(() => _selectedWinner = val),
+                      decoration: _inputDecoration('Winner'),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  )
                 : _buildDetailRow(
                     "assets/images/winner_icon.png",
                     'Winner',

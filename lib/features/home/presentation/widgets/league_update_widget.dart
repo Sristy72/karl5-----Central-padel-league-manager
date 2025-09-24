@@ -30,7 +30,7 @@ class LeagueUpdateWidget extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              "Season Dates: ${controller.seasonDates.value}",
+              "Season Dates: ${controller.seasonDates.value}", //! <-- Need to change
               style: const TextStyle(color: Colors.white),
             ),
             SizedBox(height: 8),

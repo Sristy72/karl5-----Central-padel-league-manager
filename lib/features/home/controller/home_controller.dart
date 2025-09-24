@@ -278,4 +278,10 @@ class HomeController extends GetxController {
       ),
     ]);
   }
+
+  void removeLeagueMatch(league_match.Match match) {
+    leagueMatches.removeWhere((m) => m.id == match.id);
+    // Also remove from the fixtures list
+    fixtures.removeWhere((f) => f.date == match.matchDateTime.toLocal().toIso8601String().split('T').first);
+  }
 }

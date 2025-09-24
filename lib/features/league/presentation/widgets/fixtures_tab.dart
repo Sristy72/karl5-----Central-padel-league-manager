@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../home/data/home_repository.dart';
 import '../../models/match_model.dart';
 
-class FixturesTab extends StatelessWidget {
+class FixturesTab extends StatefulWidget {
   final List<Match> matches;
+  final Function(Match match)? onRemove; // optional callback for removing
 
-  const FixturesTab({super.key, required this.matches});
+  const FixturesTab({super.key, required this.matches, this.onRemove});
+
+  @override
+  State<FixturesTab> createState() => _FixturesTabState();
+}
+
+class _FixturesTabState extends State<FixturesTab> {
+  bool _isEditing = false;
+  late HomeRepository _repository;
+
+  @override
+  void initState() {
+    super.initState();
+    _repository = Get.find<HomeRepository>();
+  }
 
   //* Group matches by Date
   Map<String, List<Match>> _groupByDate(List<Match> input) {
@@ -20,9 +37,71 @@ class FixturesTab extends StatelessWidget {
     return {for (var k in sortedKeys) k: map[k]!};
   }
 
+  Future<void> _deleteMatch(Match match) async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey.shade900,
+        title: const Text('Delete Fixture', style: TextStyle(color: Colors.white)),
+        content: Text(
+          'Are you sure you want to delete the match between ${match.teamOne.teamName} vs ${match.teamTwo.teamName}?',
+          style: const TextStyle(color: Colors.white),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      final result = await _repository.deleteMatch(match.id);
+      result.fold(
+        (failure) {
+          // Show error message
+          Get.snackbar(
+            'Error',
+            'Failed to delete fixture: ${failure.message}',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        },
+        (success) {
+          // Show success message
+          Get.snackbar(
+            'Success',
+            'Fixture deleted successfully',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+          // Call the onRemove callback to update parent widget
+          if (widget.onRemove != null) {
+            widget.onRemove!(match);
+          }
+        },
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to delete fixture: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (matches.isEmpty) {
+    if (widget.matches.isEmpty) {
       return const Center(
         child: Text(
           'No fixtures available',
@@ -31,7 +110,7 @@ class FixturesTab extends StatelessWidget {
       );
     }
 
-    final grouped = _groupByDate(matches);
+    final grouped = _groupByDate(widget.matches);
 
     return MediaQuery.removePadding(
       context: context,
@@ -49,16 +128,35 @@ class FixturesTab extends StatelessWidget {
             child: Container(height: 2, color: AppColors.gray),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
-              'Fixtures',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+          // Fixtures header with edit button
+          Row(
+            children: [
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Fixtures',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-            ),
+              IconButton(
+                icon: Image(
+                  height: 22,
+                  width: 22,
+                  image: AssetImage("assets/images/edit_icon.png"),
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isEditing = !_isEditing;
+                  });
+                },
+              ),
+            ],
           ),
 
           const SizedBox(height: 12),
@@ -133,7 +231,7 @@ class FixturesTab extends StatelessWidget {
                               ),
                             ),
 
-                            // Time and score
+                            //* <--- Time and score --->
                             Column(
                               children: [
                                 Text(
@@ -186,6 +284,36 @@ class FixturesTab extends StatelessWidget {
                                   ),
                                 ],
                               ),
+                            ),
+
+                            SizedBox(width: 12),
+                            IconButton(
+                              icon: _isEditing
+                                  ? const Image(
+                                      height: 24,
+                                      width: 21,
+                                      image: AssetImage(
+                                        "assets/images/minus_icon.png",
+                                      ),
+                                    )
+                                  : const Image(
+                                      height: 21,
+                                      width: 21,
+                                      image: AssetImage(
+                                        "assets/images/star_icon_off.png",
+                                      ),
+                                    ),
+                              onPressed: () {
+                                if (_isEditing) {
+                                  //* <--- Delete fixture action here
+                                  _deleteMatch(m);
+                                } else {
+                                  //* <--- Favorite Action Here
+                                  debugPrint(
+                                    "Star tapped for ${m.teamOne.teamName} vs ${m.teamTwo.teamName}",
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),

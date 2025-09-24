@@ -14,7 +14,10 @@ class HomeFixturesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Fixtures')),
-      body: FixturesTab(matches: matches),
+      body: FixturesTab(
+        matches: matches,
+        onRemove: (match) => controller.removeLeagueMatch(match),
+      ),
     );
   }
 }

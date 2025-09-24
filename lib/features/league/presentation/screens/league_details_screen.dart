@@ -105,7 +105,10 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
                 child: Text(msg, style: const TextStyle(color: Colors.white)),
               );
             }
-            return FixturesTab(matches: ctrl.matches.toList());
+            return FixturesTab(
+              matches: ctrl.matches.toList(),
+              onRemove: (match) => ctrl.removeMatch(match),
+            );
           }),
         ],
       ),

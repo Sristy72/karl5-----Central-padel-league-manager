@@ -22,7 +22,6 @@ class _TeamsTabState extends State<TeamsTab> {
   late final TeamRepository _repo;
 
   @override
-
   void initState() {
     super.initState();
     _teams = List<Team>.from(widget.teamsData);
@@ -92,9 +91,7 @@ class _TeamsTabState extends State<TeamsTab> {
                       icon: Image(
                         height: 22,
                         width: 22,
-                        image: isEditMode.value
-                            ? AssetImage("assets/images/cross_icon.png")
-                            : AssetImage("assets/images/edit_icon.png"),
+                        image: AssetImage("assets/images/edit_icon.png"),
                         color: Colors.white,
                       ),
                       tooltip: isEditMode.value ? "Done" : "Edit",
