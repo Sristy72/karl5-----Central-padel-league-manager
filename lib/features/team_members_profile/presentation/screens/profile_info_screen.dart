@@ -21,7 +21,6 @@ class ProfileInfoScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        
         backgroundColor: Colors.black,
         elevation: 0,
         title: const Text(
@@ -79,39 +78,38 @@ class ProfileInfoScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 19),
+
             // My Team
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFD9D9D9),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onPressed: () {},
-                child: const Text(
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF060606),
-                  ),
-                  "My team",
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 36),
-            // Matches and Level
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildStatBox("${member.matches}", "Matches"),
-                const SizedBox(width: 21),
-                _buildStatBox("${member.level}", "Level"),
-              ],
-            ),
-
+            // Align(
+            //   alignment: Alignment.centerRight,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Color(0xFFD9D9D9),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(8),
+            //       ),
+            //     ),
+            //     onPressed: () {},
+            //     child: const Text(
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.w400,
+            //         color: Color(0xFF060606),
+            //       ),
+            //       "My team",
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 36),
+            // // Matches and Level
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     _buildStatBox("${member.matches}", "Matches"),
+            //     const SizedBox(width: 21),
+            //     _buildStatBox("${member.level}", "Level"),
+            //   ],
+            // ),
             const SizedBox(height: 33),
             Card(
               elevation: 4,

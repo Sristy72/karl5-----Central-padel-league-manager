@@ -3,7 +3,6 @@ import 'package:flutx_core/flutx_core.dart';
 
 import 'app_colors.dart';
 
-
 extension InputDecorationExtensions on BuildContext {
   InputDecoration get primaryInputDecoration => InputDecoration(
     filled: true,
@@ -20,10 +19,7 @@ extension InputDecorationExtensions on BuildContext {
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSizes.paddingSm.size),
-      borderSide: BorderSide(
-        color: AppColors.textFieldBorder,
-        width: 1.5,
-      ),
+      borderSide: BorderSide(color: AppColors.textFieldBorder, width: 1.5),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSizes.paddingSm.size),

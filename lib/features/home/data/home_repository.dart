@@ -10,4 +10,6 @@ abstract class HomeRepository {
   NetworkResult<List<league_standing.Standing>> getAllStandings();
 
   NetworkResult<List<league_model.League>> getAllLeagues();
+
+  NetworkResult<Map<String, dynamic>> deleteMatch(String matchId);
 }

@@ -46,7 +46,7 @@ class CustomLeagueAppbar extends StatelessWidget
                   )
                 : Image.asset(backgroundImagePath, fit: BoxFit.cover),
           ),
-          Container(color: Colors.black.withValues(alpha: 0.5)),
+          Container(color: Colors.black.withOpacity(0.5)),
           Column(
             children: [
               Padding(

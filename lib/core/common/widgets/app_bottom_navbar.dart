@@ -10,7 +10,7 @@ import '../../../features/team_members_profile/presentation/screens/profile_info
 
 // Create a GetX controller for navigation
 class BottomNavController extends GetxController {
-  final RxInt currentIndex = 0.obs;
+  final currentIndex = 0.obs;
 
   void changeIndex(int index) {
     currentIndex.value = index;
@@ -25,7 +25,7 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize the controller if not already initialized
-    final BottomNavController controller = Get.put(BottomNavController());
+    final controller = Get.put(BottomNavController());
     controller.currentIndex.value = currentIndex;
 
     Widget _buildNavItem({
@@ -141,9 +141,9 @@ class AppBottomNavBar extends StatelessWidget {
             BottomNavigationBarItem(
               icon: _buildNavItem(
                 index: 2,
-                icon: "assets/images/nav_noti_off.png",
-                activeIcon: "assets/images/nav_noti_on.png",
-                label: "Notification",
+                icon: "assets/icons/Vector.png",
+                activeIcon: "assets/icons/Vector.png",
+                label: "League",
               ),
               label: '',
             ),

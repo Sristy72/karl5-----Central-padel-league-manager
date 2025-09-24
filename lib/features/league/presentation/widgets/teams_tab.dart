@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:flutx_core/flutx_core.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
+import '../../data/team_repository.dart';
 import '../../models/team_model.dart';
-import '../../domain/repo/team_repository.dart';
 import '../../data/team_repository_impl.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -25,14 +27,13 @@ class _TeamsTabState extends State<TeamsTab> {
   void initState() {
     super.initState();
     _teams = List<Team>.from(widget.teamsData);
-    // Resolve repository; if not registered (ordering/hot-reload issue),
-    // register a fallback implementation using the global ApiClient.
+
     try {
       _repo = Get.find<TeamRepository>();
     } catch (_) {
       final apiClient = Get.find<ApiClient>();
       Get.lazyPut<TeamRepository>(
-        () => TeamRepositoryImpl(apiClient: apiClient),
+        () => TeamRepositoryImpl(apiclient: apiClient),
       );
       _repo = Get.find<TeamRepository>();
     }
@@ -91,9 +92,7 @@ class _TeamsTabState extends State<TeamsTab> {
                       icon: Image(
                         height: 22,
                         width: 22,
-                        image: isEditMode.value
-                            ? AssetImage("assets/images/cross_icon.png")
-                            : AssetImage("assets/images/edit_icon.png"),
+                        image: AssetImage("assets/images/edit_icon.png"),
                         color: Colors.white,
                       ),
                       tooltip: isEditMode.value ? "Done" : "Edit",
@@ -167,23 +166,75 @@ class _TeamsTabState extends State<TeamsTab> {
                                     );
                                     if (confirm != true) return;
 
+                                    //* Ensure access token is fresh before delete
+                                    try {
+                                      final apiClient = Get.find<ApiClient>();
+                                      final refreshed = await apiClient
+                                          .refreshAuth();
+                                      if (kDebugMode) {
+                                        print(
+                                          'Refresh result before deleteTeam: $refreshed',
+                                        );
+                                      }
+                                    } catch (e) {
+                                      if (kDebugMode) {
+                                        DPrint.log(
+                                          'No ApiClient found to refresh: $e',
+                                        );
+                                      }
+                                    }
+
                                     // Call delete API
                                     final result = await _repo.deleteTeam(
                                       team.id,
                                     );
-                                    result.fold(
-                                      (fail) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Delete failed: ${fail.message}',
-                                            ),
-                                          ),
+
+                                    // handle result in a safe, runtime-checked way
+                                    final res = result;
+                                    bool handled = false;
+                                    try {
+                                      // If the result implements fold (e.g. Either-like), use it
+                                      final foldFn = (res as dynamic).fold;
+                                      if (foldFn is Function) {
+                                        (res as dynamic).fold(
+                                          (fail) {
+                                            final msg =
+                                                (fail as dynamic)?.message ??
+                                                'Delete failed';
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(content: Text(msg)),
+                                            );
+                                          },
+                                          (success) {
+                                            setState(() {
+                                              _teams.removeAt(index);
+                                            });
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Team deleted'),
+                                              ),
+                                            );
+                                          },
                                         );
-                                      },
-                                      (success) {
+                                        handled = true;
+                                      }
+                                    } catch (_) {
+                                      // ignore and fallback below
+                                    }
+
+                                    if (!handled) {
+                                      // Fallback: common NetworkResult shapes
+                                      final dyn = res as dynamic;
+                                      final bool success =
+                                          (dyn.data != null) ||
+                                          (dyn.isSuccess == true) ||
+                                          (dyn.status == 'success');
+
+                                      if (success) {
                                         setState(() {
                                           _teams.removeAt(index);
                                         });
@@ -194,8 +245,20 @@ class _TeamsTabState extends State<TeamsTab> {
                                             content: Text('Team deleted'),
                                           ),
                                         );
-                                      },
-                                    );
+                                      } else {
+                                        final msg =
+                                            dyn.message ??
+                                            dyn.error?.message ??
+                                            'Delete failed';
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(msg.toString()),
+                                          ),
+                                        );
+                                      }
+                                    }
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.all(6.0),

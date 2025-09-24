@@ -21,7 +21,7 @@ class Match {
   DateTime matchDateTime;
   final String matchStatus;
   final List<SetScore> sets;
-  final Team? winnerTeam;
+  Team? winnerTeam;
   String venueName;
   String leagueName;
   final String leagueId;
