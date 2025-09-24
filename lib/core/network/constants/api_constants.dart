@@ -22,6 +22,7 @@ class ApiConstants {
   /// [Endpoint Groups]
   static AuthEndpoints get auth => AuthEndpoints();
   static UserEndpoints get user => UserEndpoints();
+  static ContactEndpoints get contact => ContactEndpoints();
   static NotificationEndpoints get notification => NotificationEndpoints();
 
   static get team => null;
@@ -54,4 +55,9 @@ class NotificationEndpoints {
   static const String _base = '${ApiConstants.baseUrl}/notification';
 
   final String getnotifications = '$_base/getnotifications';
+}
+
+class ContactEndpoints {
+  static const String _base = '${ApiConstants.baseUrl}/contact';
+  final String createContact = '$_base/create';
 }
