@@ -312,7 +312,10 @@ class _MatchCardState extends State<_MatchCard> {
                           .map(
                             (t) => DropdownMenuItem<Team?>(
                               value: t,
-                              child: Text(t.teamName, style: const TextStyle(color: Colors.white)),
+                              child: Text(
+                                t.teamName,
+                                style: const TextStyle(color: Colors.white),
+                              ),
                             ),
                           )
                           .toList(),

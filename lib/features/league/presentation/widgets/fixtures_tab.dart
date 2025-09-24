@@ -43,7 +43,10 @@ class _FixturesTabState extends State<FixturesTab> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
-        title: const Text('Delete Fixture', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Delete Fixture',
+          style: TextStyle(color: Colors.white),
+        ),
         content: Text(
           'Are you sure you want to delete the match between ${match.teamOne.teamName} vs ${match.teamTwo.teamName}?',
           style: const TextStyle(color: Colors.white),
