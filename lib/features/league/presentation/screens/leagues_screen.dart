@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../presentation/controllers/league_controller.dart';
 import '../widgets/league_card.dart';
 
@@ -12,6 +13,7 @@ class LeaguesScreen extends StatelessWidget {
     final controller = Get.find<LeagueController>();
 
     return Scaffold(
+      backgroundColor: AppColors.leagueBackgroundGrey,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

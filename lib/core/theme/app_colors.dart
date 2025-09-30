@@ -34,6 +34,7 @@ class AppColors {
   ///Ifitikhar
   static const Color teamCardBackground = Color(0xFFD9D9D9);
   static const Color leaguTabsBackground = Color(0xFF141414);
+  static const Color leagueBackgroundGrey = Color(0xFF141414);
 
   ///close Ifitikhar
 }

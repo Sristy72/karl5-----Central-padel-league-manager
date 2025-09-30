@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: AppColors.primaryBackground,
+          backgroundColor: AppColors.leagueBackgroundGrey,
           elevation: 0,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: Container(
-        color: AppColors.primaryBackground,
+        color: AppColors.leagueBackgroundGrey,
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(

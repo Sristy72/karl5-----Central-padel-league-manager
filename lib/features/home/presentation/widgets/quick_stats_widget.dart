@@ -12,7 +12,9 @@ class QuickStatsWidget extends StatelessWidget {
 
     return Obx(
       () => Container(
-        padding: EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width < 350 ? 12 : 24,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -24,7 +26,10 @@ class QuickStatsWidget extends StatelessWidget {
 
             //* <--- Table Header --->
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              padding: EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: MediaQuery.of(context).size.width < 350 ? 8 : 12,
+              ),
               child: Row(
                 children: const [
                   Expanded(
