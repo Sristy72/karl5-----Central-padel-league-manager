@@ -12,15 +12,18 @@ class QuickStatsWidget extends StatelessWidget {
 
     return Obx(
       () => Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width < 350 ? 12 : 24,
+        margin: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width < 350 ? 8 : 16,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Quick Stats",
-              style: TextStyle(color: Colors.white, fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: const Text(
+                "Quick Stats",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
             ),
             const SizedBox(height: 8),
 
@@ -119,6 +122,7 @@ class QuickStatsWidget extends StatelessWidget {
                             style: const TextStyle(
                               color: Colors.white70,
                               fontWeight: FontWeight.bold,
+                              fontSize: 10,
                             ),
                           ),
 
