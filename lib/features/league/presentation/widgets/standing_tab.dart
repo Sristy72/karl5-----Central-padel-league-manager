@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../models/standing_model.dart';
 
 class StandingTab extends StatefulWidget {
@@ -52,10 +53,15 @@ class _StandingTabState extends State<StandingTab> {
             child: DataTable(
               columnSpacing: 8.0,
               horizontalMargin: 8,
-              headingRowColor: WidgetStateProperty.all(Colors.black),
-              dataRowColor: WidgetStateProperty.all(const Color(0xFFE2E2E2)),
+              headingRowColor: WidgetStateProperty.all(
+                AppColors.leagueBackgroundGrey,
+              ),
+              dataRowColor: WidgetStateProperty.all(AppColors.white),
               border: const TableBorder(
-                horizontalInside: BorderSide(color: Colors.black, width: 10),
+                horizontalInside: BorderSide(
+                  color: AppColors.leagueBackgroundGrey,
+                  width: 10,
+                ),
               ),
               columns: const [
                 DataColumn(
