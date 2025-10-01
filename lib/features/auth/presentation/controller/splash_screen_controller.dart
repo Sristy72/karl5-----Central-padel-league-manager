@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../screens/home_screen.dart';
+import '../../../home/presentation/screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import 'auth_controller.dart';
 
