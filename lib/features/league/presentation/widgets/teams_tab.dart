@@ -65,7 +65,7 @@ class _TeamsTabState extends State<TeamsTab> {
                   child: Text(
                     isEditMode.value ? "Edit Teams" : "Teams",
                     style: const TextStyle(
-                      color: AppColors.teamCardBackground,
+                      color: AppColors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),

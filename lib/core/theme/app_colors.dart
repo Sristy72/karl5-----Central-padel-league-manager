@@ -29,12 +29,14 @@ class AppColors {
   static const Color textBoxColor = Color(0xFFD9D9D9);
   static const Color textColor = Color(0xFF151515);
   static const Color notificationColor = Color(0xFFEDF9FF);
+  static const Color paypalColor = Color(0xFF2B7FD0);
 
   ///close Marjana
-  ///Ifitikhar
-  static const Color teamCardBackground = Color(0xFFD9D9D9);
-  static const Color leaguTabsBackground = Color(0xFF141414);
+  //! <--- Iftikhar --->
+  static const Color leagueFieldBackground = Color(0xFFE2E2E2);
+  static const Color leagueBackground = Color(0xFF353535);
+  static const Color leagueFixtureText = Color(0xFFB1B1B1);
   static const Color leagueBackgroundGrey = Color(0xFF141414);
-
-  ///close Ifitikhar
+  static const Color teamDetailsCardBackground = Color(0xFF202020);
+  //! <--- Iftikhar Close --->
 }

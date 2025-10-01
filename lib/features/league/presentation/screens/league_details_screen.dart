@@ -48,7 +48,7 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.leaguTabsBackground,
+      backgroundColor: AppColors.leagueBackgroundGrey,
       appBar: CustomLeagueAppbar(
         leagueName: widget.league.leagueName,
         leagueLogoPath: widget.league.leagueLogo.isNotEmpty

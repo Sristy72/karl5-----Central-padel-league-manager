@@ -33,7 +33,7 @@ class LeagueUpdateWidget extends StatelessWidget {
                 fontSize: MediaQuery.of(context).size.width < 350 ? 12 : 14,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               "Season Dates: ${_formatSeasonDates(controller.seasonDates.value)}",
               style: TextStyle(
@@ -41,7 +41,7 @@ class LeagueUpdateWidget extends StatelessWidget {
                 fontSize: MediaQuery.of(context).size.width < 350 ? 12 : 14,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               "Status: ${controller.status.value}",
               style: TextStyle(

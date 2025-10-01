@@ -10,6 +10,8 @@ import '../../features/league/data/league_repository.dart';
 import '../../features/league/data/league_repository_impl.dart';
 import '../../features/Create_league/data/create_league_repository.dart';
 import '../../features/Create_league/data/create_league_repository_impl.dart';
+import '../../features/team_details/data/repo/team_repo_impl.dart';
+import '../../features/team_details/domain/repo/team_repo.dart';
 
 void setupRepository() {
   Get.lazyPut<AuthRepository>(
@@ -41,4 +43,7 @@ void setupRepository() {
     fenix: true,
     () => TeamRepositoryImpl(apiclient: Get.find()),
   );
+
+  // Team details repository (used by TeamController)
+  Get.lazyPut<TeamRepo>(fenix: true, () => TeamRepoImpl(apiClient: Get.find()));
 }

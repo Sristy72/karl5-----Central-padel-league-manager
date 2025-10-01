@@ -75,7 +75,7 @@ class _MatchCardState extends State<_MatchCard> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Card(
-      color: AppColors.leaguTabsBackground,
+      color: AppColors.leagueBackgroundGrey,
       margin: const EdgeInsets.only(bottom: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
       child: Padding(
@@ -109,7 +109,7 @@ class _MatchCardState extends State<_MatchCard> {
                   child: Text(
                     _isEditing ? "Edit Match" : "Match",
                     style: const TextStyle(
-                      color: AppColors.teamCardBackground,
+                      color: AppColors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
@@ -304,10 +304,10 @@ class _MatchCardState extends State<_MatchCard> {
 
             _isEditing
                 ? Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(12.0),
                     child: DropdownButtonFormField<Team?>(
                       dropdownColor: Colors.black87,
-                      value: _selectedWinner,
+                      initialValue: _selectedWinner,
                       items: [widget.match.teamOne, widget.match.teamTwo]
                           .map(
                             (t) => DropdownMenuItem<Team?>(
@@ -354,7 +354,7 @@ class _MatchCardState extends State<_MatchCard> {
         Container(
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
-            color: AppColors.teamCardBackground,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(4),
           ),
           child: (logoPath.startsWith('http') || logoPath.startsWith('https'))
