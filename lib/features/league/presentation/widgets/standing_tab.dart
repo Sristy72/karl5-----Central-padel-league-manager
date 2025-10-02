@@ -17,7 +17,7 @@ class _StandingTabState extends State<StandingTab> {
   int? editingIndex;
   late List<Standing> editableStandingsData;
   bool _isSaving = false;
-  
+
   // Repository for API calls
   late final LeagueRepositoryImpl _repository;
 
@@ -25,7 +25,7 @@ class _StandingTabState extends State<StandingTab> {
   void initState() {
     super.initState();
     _repository = LeagueRepositoryImpl(apiClient: ApiClient());
-    
+
     // Create a copy of the standings data for editing
     editableStandingsData = widget.standingsData
         .map(
@@ -51,12 +51,12 @@ class _StandingTabState extends State<StandingTab> {
   Future<void> _saveStandingUpdates(int index) async {
     final standing = editableStandingsData[index];
     final original = widget.standingsData[index];
-    
+
     setState(() => _isSaving = true);
-    
+
     // Build update payload with only changed fields
     final updates = <String, dynamic>{};
-    
+
     if (standing.played != original.played) {
       updates['played'] = standing.played;
     }
@@ -75,17 +75,17 @@ class _StandingTabState extends State<StandingTab> {
     if (standing.points != original.points) {
       updates['points'] = standing.points;
     }
-    
+
     if (updates.isEmpty) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No changes to save')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No changes to save')));
       return;
     }
-    
+
     final result = await _repository.updateStanding(standing.id, updates);
-    
+
     result.fold(
       (failure) {
         if (mounted) {
@@ -101,10 +101,10 @@ class _StandingTabState extends State<StandingTab> {
       (success) {
         if (mounted) {
           setState(() => _isSaving = false);
-          
+
           // Update the original data
           widget.standingsData[index] = standing;
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Standing updated for ${standing.teamName}'),
@@ -127,7 +127,7 @@ class _StandingTabState extends State<StandingTab> {
           child: SizedBox(
             width: screenWidth,
             child: DataTable(
-              columnSpacing: 8.0,
+              columnSpacing: 12.0,
               horizontalMargin: 8,
               headingRowColor: WidgetStateProperty.all(
                 AppColors.leagueBackgroundGrey,
@@ -241,8 +241,8 @@ class _StandingTabState extends State<StandingTab> {
                                 style: TextStyle(fontSize: 12),
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 0,
+                                    horizontal: 2,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -299,7 +299,7 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
                                 controller: TextEditingController(
                                   text: standing.played.toString(),
@@ -310,7 +310,7 @@ class _StandingTabState extends State<StandingTab> {
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -347,7 +347,7 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
                                 controller: TextEditingController(
                                   text: standing.won.toString(),
@@ -358,7 +358,7 @@ class _StandingTabState extends State<StandingTab> {
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -395,7 +395,7 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
                                 controller: TextEditingController(
                                   text: standing.drawn.toString(),
@@ -406,7 +406,7 @@ class _StandingTabState extends State<StandingTab> {
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -443,7 +443,7 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
                                 controller: TextEditingController(
                                   text: standing.lost.toString(),
@@ -454,7 +454,7 @@ class _StandingTabState extends State<StandingTab> {
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -491,7 +491,7 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
                                 controller: TextEditingController(
                                   text: standing.goalDifference.toString(),
@@ -502,7 +502,7 @@ class _StandingTabState extends State<StandingTab> {
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -540,7 +540,7 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
                                 controller: TextEditingController(
                                   text: standing.points.toString(),
@@ -551,7 +551,7 @@ class _StandingTabState extends State<StandingTab> {
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -590,38 +590,38 @@ class _StandingTabState extends State<StandingTab> {
                         width: isEditing ? 50 : 40,
                         child: isEditing
                             ? _isSaving
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.green,
-                                    ),
-                                  )
-                                : Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Save button (replaces the edit icon while editing)
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.check,
-                                          color: Colors.green,
-                                          size: 18,
-                                        ),
-                                        onPressed: () async {
-                                          await _saveStandingUpdates(index);
-                                          setState(() {
-                                            editingIndex = null;
-                                          });
-                                        },
-                                        constraints: BoxConstraints(
-                                          minWidth: 32,
-                                          minHeight: 32,
-                                        ),
-                                        padding: EdgeInsets.zero,
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.green,
                                       ),
-                                    ],
-                                  )
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Save button (replaces the edit icon while editing)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.check,
+                                            color: Colors.green,
+                                            size: 18,
+                                          ),
+                                          onPressed: () async {
+                                            await _saveStandingUpdates(index);
+                                            setState(() {
+                                              editingIndex = null;
+                                            });
+                                          },
+                                          constraints: BoxConstraints(
+                                            minWidth: 32,
+                                            minHeight: 32,
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                      ],
+                                    )
                             : IconButton(
                                 icon: Icon(
                                   Icons.more_vert,
