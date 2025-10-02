@@ -21,6 +21,9 @@ class _StandingTabState extends State<StandingTab> {
   // Repository for API calls
   late final LeagueRepositoryImpl _repository;
 
+  // Controllers for editing - key is the index
+  final Map<int, Map<String, TextEditingController>> _controllers = {};
+
   @override
   void initState() {
     super.initState();
@@ -48,32 +51,82 @@ class _StandingTabState extends State<StandingTab> {
         .toList();
   }
 
+  @override
+  void dispose() {
+    // Dispose all controllers
+    for (var controllerMap in _controllers.values) {
+      for (var controller in controllerMap.values) {
+        controller.dispose();
+      }
+    }
+    super.dispose();
+  }
+
+  void _initializeControllers(int index, Standing standing) {
+    if (!_controllers.containsKey(index)) {
+      _controllers[index] = {
+        'played': TextEditingController(text: standing.played.toString()),
+        'won': TextEditingController(text: standing.won.toString()),
+        'drawn': TextEditingController(text: standing.drawn.toString()),
+        'lost': TextEditingController(text: standing.lost.toString()),
+        'goalDifference': TextEditingController(
+          text: standing.goalDifference.toString(),
+        ),
+        'points': TextEditingController(text: standing.points.toString()),
+      };
+    }
+  }
+
+  void _disposeControllers(int index) {
+    if (_controllers.containsKey(index)) {
+      for (var controller in _controllers[index]!.values) {
+        controller.dispose();
+      }
+      _controllers.remove(index);
+    }
+  }
+
   Future<void> _saveStandingUpdates(int index) async {
     final standing = editableStandingsData[index];
     final original = widget.standingsData[index];
+    final controllers = _controllers[index];
+
+    if (controllers == null) {
+      return;
+    }
 
     setState(() => _isSaving = true);
+
+    // Read values from controllers
+    final played = int.tryParse(controllers['played']!.text) ?? original.played;
+    final won = int.tryParse(controllers['won']!.text) ?? original.won;
+    final drawn = int.tryParse(controllers['drawn']!.text) ?? original.drawn;
+    final lost = int.tryParse(controllers['lost']!.text) ?? original.lost;
+    final goalDifference =
+        int.tryParse(controllers['goalDifference']!.text) ??
+        original.goalDifference;
+    final points = int.tryParse(controllers['points']!.text) ?? original.points;
 
     // Build update payload with only changed fields
     final updates = <String, dynamic>{};
 
-    if (standing.played != original.played) {
-      updates['played'] = standing.played;
+    if (played != original.played) {
+      updates['played'] = played;
     }
-    if (standing.won != original.won) {
-      updates['won'] = standing.won;
+    if (won != original.won) {
+      updates['won'] = won;
     }
-    if (standing.drawn != original.drawn) {
-      updates['drawn'] = standing.drawn;
+    if (drawn != original.drawn) {
+      updates['drawn'] = drawn;
     }
-    if (standing.lost != original.lost) {
-      updates['lost'] = standing.lost;
+    if (lost != original.lost) {
+      updates['lost'] = lost;
     }
-    if (standing.goalDifference != original.goalDifference) {
-      updates['goalDifference'] = standing.goalDifference;
+    if (goalDifference != original.goalDifference) {
+      updates['goalDifference'] = goalDifference;
     }
-    if (standing.points != original.points) {
-      updates['points'] = standing.points;
+    if (points != original.points) {
+      updates['points'] = points;
     }
 
     if (updates.isEmpty) {
@@ -102,8 +155,29 @@ class _StandingTabState extends State<StandingTab> {
         if (mounted) {
           setState(() => _isSaving = false);
 
-          // Update the original data
-          widget.standingsData[index] = standing;
+          // Create updated standing with new values
+          final updatedStanding = Standing(
+            id: standing.id,
+            leagueId: standing.leagueId,
+            leagueName: standing.leagueName,
+            teamId: standing.teamId,
+            position: standing.position,
+            teamName: standing.teamName,
+            teamLogoUrl: standing.teamLogoUrl,
+            played: played,
+            won: won,
+            drawn: drawn,
+            lost: lost,
+            goalDifference: goalDifference,
+            points: points,
+          );
+
+          // Update both lists
+          widget.standingsData[index] = updatedStanding;
+          editableStandingsData[index] = updatedStanding;
+
+          // Dispose controllers for this row
+          _disposeControllers(index);
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -227,6 +301,11 @@ class _StandingTabState extends State<StandingTab> {
                 final standing = entry.value;
                 final isEditing = editingIndex == index;
 
+                // Initialize controllers when entering edit mode
+                if (isEditing) {
+                  _initializeControllers(index, standing);
+                }
+
                 return DataRow(
                   cells: [
                     DataCell(Text(standing.position.toString())),
@@ -301,9 +380,7 @@ class _StandingTabState extends State<StandingTab> {
                           ? SizedBox(
                               width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.played.toString(),
-                                ),
+                                controller: _controllers[index]!['played'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
@@ -317,25 +394,6 @@ class _StandingTabState extends State<StandingTab> {
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.played;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: intValue,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -349,9 +407,7 @@ class _StandingTabState extends State<StandingTab> {
                           ? SizedBox(
                               width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.won.toString(),
-                                ),
+                                controller: _controllers[index]!['won'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
@@ -365,25 +421,6 @@ class _StandingTabState extends State<StandingTab> {
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.won;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: intValue,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -397,9 +434,7 @@ class _StandingTabState extends State<StandingTab> {
                           ? SizedBox(
                               width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.drawn.toString(),
-                                ),
+                                controller: _controllers[index]!['drawn'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
@@ -413,25 +448,6 @@ class _StandingTabState extends State<StandingTab> {
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.drawn;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: intValue,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -445,9 +461,7 @@ class _StandingTabState extends State<StandingTab> {
                           ? SizedBox(
                               width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.lost.toString(),
-                                ),
+                                controller: _controllers[index]!['lost'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
@@ -461,25 +475,6 @@ class _StandingTabState extends State<StandingTab> {
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.lost;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: intValue,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -493,9 +488,8 @@ class _StandingTabState extends State<StandingTab> {
                           ? SizedBox(
                               width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.goalDifference.toString(),
-                                ),
+                                controller:
+                                    _controllers[index]!['goalDifference'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
@@ -509,26 +503,6 @@ class _StandingTabState extends State<StandingTab> {
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ??
-                                      standing.goalDifference;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: intValue,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
