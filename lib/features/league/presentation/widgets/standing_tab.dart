@@ -516,9 +516,6 @@ class _StandingTabState extends State<StandingTab> {
                           ? SizedBox(
                               width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.points.toString(),
-                                ),
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
@@ -532,25 +529,6 @@ class _StandingTabState extends State<StandingTab> {
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.points;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: intValue,
-                                  );
-                                },
                               ),
                             )
                           : Text(
