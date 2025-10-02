@@ -60,4 +60,17 @@ class LeagueRepositoryImpl implements LeagueRepository {
       fromJsonT: (json) => json as Map<String, dynamic>,
     );
   }
+
+  @override
+  NetworkResult<Map<String, dynamic>> updateStanding(
+    String standingId,
+    Map<String, dynamic> updates,
+  ) {
+    final endpoint = '${ApiConstants.baseUrl}/standing/$standingId';
+    return _apiClient.patch<Map<String, dynamic>>(
+      endpoint,
+      data: updates,
+      fromJsonT: (json) => json as Map<String, dynamic>,
+    );
+  }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/network/api_client.dart';
 import '../../models/standing_model.dart';
+import '../../data/league_repository_impl.dart';
 
 class StandingTab extends StatefulWidget {
   final List<Standing> standingsData;
@@ -14,10 +16,16 @@ class StandingTab extends StatefulWidget {
 class _StandingTabState extends State<StandingTab> {
   int? editingIndex;
   late List<Standing> editableStandingsData;
+  bool _isSaving = false;
+  
+  // Repository for API calls
+  late final LeagueRepositoryImpl _repository;
 
   @override
   void initState() {
     super.initState();
+    _repository = LeagueRepositoryImpl(apiClient: ApiClient());
+    
     // Create a copy of the standings data for editing
     editableStandingsData = widget.standingsData
         .map(
@@ -38,6 +46,74 @@ class _StandingTabState extends State<StandingTab> {
           ),
         )
         .toList();
+  }
+
+  Future<void> _saveStandingUpdates(int index) async {
+    final standing = editableStandingsData[index];
+    final original = widget.standingsData[index];
+    
+    setState(() => _isSaving = true);
+    
+    // Build update payload with only changed fields
+    final updates = <String, dynamic>{};
+    
+    if (standing.played != original.played) {
+      updates['played'] = standing.played;
+    }
+    if (standing.won != original.won) {
+      updates['won'] = standing.won;
+    }
+    if (standing.drawn != original.drawn) {
+      updates['drawn'] = standing.drawn;
+    }
+    if (standing.lost != original.lost) {
+      updates['lost'] = standing.lost;
+    }
+    if (standing.goalDifference != original.goalDifference) {
+      updates['goalDifference'] = standing.goalDifference;
+    }
+    if (standing.points != original.points) {
+      updates['points'] = standing.points;
+    }
+    
+    if (updates.isEmpty) {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No changes to save')),
+      );
+      return;
+    }
+    
+    final result = await _repository.updateStanding(standing.id, updates);
+    
+    result.fold(
+      (failure) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update standing: ${failure.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      (success) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+          
+          // Update the original data
+          widget.standingsData[index] = standing;
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Standing updated for ${standing.teamName}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -513,34 +589,39 @@ class _StandingTabState extends State<StandingTab> {
                       Container(
                         width: isEditing ? 50 : 40,
                         child: isEditing
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // Save button (replaces the edit icon while editing)
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.check,
+                            ? _isSaving
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
                                       color: Colors.green,
-                                      size: 18,
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        editingIndex = null;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Changes saved for ${standing.teamName}',
-                                            ),
-                                            duration: Duration(seconds: 2),
-                                          ),
-                                        );
-                                      });
-                                    },
-                                  ),
-                                ],
-                              )
+                                  )
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Save button (replaces the edit icon while editing)
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                          size: 18,
+                                        ),
+                                        onPressed: () async {
+                                          await _saveStandingUpdates(index);
+                                          setState(() {
+                                            editingIndex = null;
+                                          });
+                                        },
+                                        constraints: BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                    ],
+                                  )
                             : IconButton(
                                 icon: Icon(
                                   Icons.more_vert,

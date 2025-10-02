@@ -11,4 +11,8 @@ abstract class LeagueRepository {
     String matchId,
     Map<String, dynamic> updates,
   );
+  NetworkResult<Map<String, dynamic>> updateStanding(
+    String standingId,
+    Map<String, dynamic> updates,
+  );
 }
