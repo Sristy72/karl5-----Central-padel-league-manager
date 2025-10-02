@@ -5,9 +5,14 @@ import '../../../../core/theme/app_colors.dart';
 import '../../presentation/controllers/league_controller.dart';
 import '../widgets/league_card.dart';
 
-class LeaguesScreen extends StatelessWidget {
+class LeaguesScreen extends StatefulWidget {
   const LeaguesScreen({super.key});
 
+  @override
+  State<LeaguesScreen> createState() => _LeaguesScreenState();
+}
+
+class _LeaguesScreenState extends State<LeaguesScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LeagueController>();

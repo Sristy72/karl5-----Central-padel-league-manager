@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/network/api_client.dart';
 import '../../models/standing_model.dart';
+import '../../data/league_repository_impl.dart';
 
 class StandingTab extends StatefulWidget {
   final List<Standing> standingsData;
@@ -14,10 +16,19 @@ class StandingTab extends StatefulWidget {
 class _StandingTabState extends State<StandingTab> {
   int? editingIndex;
   late List<Standing> editableStandingsData;
+  bool _isSaving = false;
+
+  // Repository for API calls
+  late final LeagueRepositoryImpl _repository;
+
+  // Controllers for editing - key is the index
+  final Map<int, Map<String, TextEditingController>> _controllers = {};
 
   @override
   void initState() {
     super.initState();
+    _repository = LeagueRepositoryImpl(apiClient: ApiClient());
+
     // Create a copy of the standings data for editing
     editableStandingsData = widget.standingsData
         .map(
@@ -41,6 +52,145 @@ class _StandingTabState extends State<StandingTab> {
   }
 
   @override
+  void dispose() {
+    // Dispose all controllers
+    for (var controllerMap in _controllers.values) {
+      for (var controller in controllerMap.values) {
+        controller.dispose();
+      }
+    }
+    super.dispose();
+  }
+
+  void _initializeControllers(int index, Standing standing) {
+    if (!_controllers.containsKey(index)) {
+      _controllers[index] = {
+        'played': TextEditingController(text: standing.played.toString()),
+        'won': TextEditingController(text: standing.won.toString()),
+        'drawn': TextEditingController(text: standing.drawn.toString()),
+        'lost': TextEditingController(text: standing.lost.toString()),
+        'goalDifference': TextEditingController(
+          text: standing.goalDifference.toString(),
+        ),
+        'points': TextEditingController(text: standing.points.toString()),
+      };
+    }
+  }
+
+  void _disposeControllers(int index) {
+    if (_controllers.containsKey(index)) {
+      for (var controller in _controllers[index]!.values) {
+        controller.dispose();
+      }
+      _controllers.remove(index);
+    }
+  }
+
+  Future<void> _saveStandingUpdates(int index) async {
+    final standing = editableStandingsData[index];
+    final original = widget.standingsData[index];
+    final controllers = _controllers[index];
+
+    if (controllers == null) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    // Read values from controllers
+    final played = int.tryParse(controllers['played']!.text) ?? original.played;
+    final won = int.tryParse(controllers['won']!.text) ?? original.won;
+    final drawn = int.tryParse(controllers['drawn']!.text) ?? original.drawn;
+    final lost = int.tryParse(controllers['lost']!.text) ?? original.lost;
+    final goalDifference =
+        int.tryParse(controllers['goalDifference']!.text) ??
+        original.goalDifference;
+    final points = int.tryParse(controllers['points']!.text) ?? original.points;
+
+    // Build update payload with only changed fields
+    final updates = <String, dynamic>{};
+
+    if (played != original.played) {
+      updates['played'] = played;
+    }
+    if (won != original.won) {
+      updates['won'] = won;
+    }
+    if (drawn != original.drawn) {
+      updates['drawn'] = drawn;
+    }
+    if (lost != original.lost) {
+      updates['lost'] = lost;
+    }
+    if (goalDifference != original.goalDifference) {
+      updates['goalDifference'] = goalDifference;
+    }
+    if (points != original.points) {
+      updates['points'] = points;
+    }
+
+    if (updates.isEmpty) {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No changes to save')));
+      return;
+    }
+
+    final result = await _repository.updateStanding(standing.id, updates);
+
+    result.fold(
+      (failure) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update standing: ${failure.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      (success) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+
+          // Create updated standing with new values
+          final updatedStanding = Standing(
+            id: standing.id,
+            leagueId: standing.leagueId,
+            leagueName: standing.leagueName,
+            teamId: standing.teamId,
+            position: standing.position,
+            teamName: standing.teamName,
+            teamLogoUrl: standing.teamLogoUrl,
+            played: played,
+            won: won,
+            drawn: drawn,
+            lost: lost,
+            goalDifference: goalDifference,
+            points: points,
+          );
+
+          // Update both lists
+          widget.standingsData[index] = updatedStanding;
+          editableStandingsData[index] = updatedStanding;
+
+          // Dispose controllers for this row
+          _disposeControllers(index);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Standing updated for ${standing.teamName}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return SingleChildScrollView(
@@ -51,7 +201,7 @@ class _StandingTabState extends State<StandingTab> {
           child: SizedBox(
             width: screenWidth,
             child: DataTable(
-              columnSpacing: 8.0,
+              columnSpacing: 12.0,
               horizontalMargin: 8,
               headingRowColor: WidgetStateProperty.all(
                 AppColors.leagueBackgroundGrey,
@@ -151,6 +301,11 @@ class _StandingTabState extends State<StandingTab> {
                 final standing = entry.value;
                 final isEditing = editingIndex == index;
 
+                // Initialize controllers when entering edit mode
+                if (isEditing) {
+                  _initializeControllers(index, standing);
+                }
+
                 return DataRow(
                   cells: [
                     DataCell(Text(standing.position.toString())),
@@ -165,8 +320,8 @@ class _StandingTabState extends State<StandingTab> {
                                 style: TextStyle(fontSize: 12),
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 0,
+                                    horizontal: 2,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
@@ -223,43 +378,22 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.played.toString(),
-                                ),
+                                controller: _controllers[index]!['played'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.played;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: intValue,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -271,43 +405,22 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.won.toString(),
-                                ),
+                                controller: _controllers[index]!['won'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.won;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: intValue,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -319,43 +432,22 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.drawn.toString(),
-                                ),
+                                controller: _controllers[index]!['drawn'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.drawn;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: intValue,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -367,43 +459,22 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.lost.toString(),
-                                ),
+                                controller: _controllers[index]!['lost'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.lost;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: intValue,
-                                    goalDifference: standing.goalDifference,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -415,44 +486,23 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.goalDifference.toString(),
-                                ),
+                                controller:
+                                    _controllers[index]!['goalDifference'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ??
-                                      standing.goalDifference;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: intValue,
-                                    points: standing.points,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -464,43 +514,22 @@ class _StandingTabState extends State<StandingTab> {
                     DataCell(
                       isEditing
                           ? SizedBox(
-                              width: 20,
+                              width: 25,
                               child: TextField(
-                                controller: TextEditingController(
-                                  text: standing.points.toString(),
-                                ),
+                                controller: _controllers[index]!['points'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
-                                    vertical: 0,
+                                    vertical: 2,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   isDense: true,
                                 ),
-                                onChanged: (value) {
-                                  final intValue =
-                                      int.tryParse(value) ?? standing.points;
-                                  editableStandingsData[index] = Standing(
-                                    id: standing.id,
-                                    leagueId: standing.leagueId,
-                                    leagueName: standing.leagueName,
-                                    teamId: standing.teamId,
-                                    position: standing.position,
-                                    teamName: standing.teamName,
-                                    teamLogoUrl: standing.teamLogoUrl,
-                                    played: standing.played,
-                                    won: standing.won,
-                                    drawn: standing.drawn,
-                                    lost: standing.lost,
-                                    goalDifference: standing.goalDifference,
-                                    points: intValue,
-                                  );
-                                },
                               ),
                             )
                           : Text(
@@ -513,34 +542,39 @@ class _StandingTabState extends State<StandingTab> {
                       Container(
                         width: isEditing ? 50 : 40,
                         child: isEditing
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // Save button (replaces the edit icon while editing)
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.check,
-                                      color: Colors.green,
-                                      size: 18,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        editingIndex = null;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Changes saved for ${standing.teamName}',
-                                            ),
-                                            duration: Duration(seconds: 2),
+                            ? _isSaving
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.green,
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Save button (replaces the edit icon while editing)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.check,
+                                            color: Colors.green,
+                                            size: 18,
                                           ),
-                                        );
-                                      });
-                                    },
-                                  ),
-                                ],
-                              )
+                                          onPressed: () async {
+                                            await _saveStandingUpdates(index);
+                                            setState(() {
+                                              editingIndex = null;
+                                            });
+                                          },
+                                          constraints: BoxConstraints(
+                                            minWidth: 32,
+                                            minHeight: 32,
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                      ],
+                                    )
                             : IconButton(
                                 icon: Icon(
                                   Icons.more_vert,
