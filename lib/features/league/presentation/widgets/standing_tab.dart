@@ -516,6 +516,7 @@ class _StandingTabState extends State<StandingTab> {
                           ? SizedBox(
                               width: 25,
                               child: TextField(
+                                controller: _controllers[index]!['points'],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
