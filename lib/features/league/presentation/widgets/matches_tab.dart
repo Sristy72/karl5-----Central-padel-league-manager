@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../models/match_model.dart';
 import '../../models/team_model.dart';
+import '../../models/league_model.dart';
+import '../../data/league_repository_impl.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/network/api_client.dart';
 import 'package:intl/intl.dart';
 
 class MatchesTab extends StatelessWidget {
@@ -33,23 +36,36 @@ class _MatchCard extends StatefulWidget {
 
 class _MatchCardState extends State<_MatchCard> {
   bool _isEditing = false;
+  bool _isSaving = false;
+  
+  // Repository for API calls
+  late final LeagueRepositoryImpl _repository;
+  
+  // Available leagues from API
+  List<League> _availableLeagues = [];
+  bool _isLoadingLeagues = false;
 
   // Controllers for editable fields
   late TextEditingController _arenaController;
   late TextEditingController _scoreController;
   late DateTime _selectedDateTime;
   String? _selectedLeague;
+  String? _selectedLeagueId;
   Team? _selectedWinner;
 
   @override
   void initState() {
     super.initState();
+    _repository = LeagueRepositoryImpl(apiClient: ApiClient());
+    
     _arenaController = TextEditingController(text: widget.match.venueName);
     _scoreController = TextEditingController(
       text: widget.match.formattedScore(),
     );
     _selectedDateTime = widget.match.matchDateTime;
     _selectedLeague = widget.match.leagueName;
+    _selectedLeagueId = widget.match.leagueId;
+    
     // Normalize winner reference to one of the team objects if ids match
     if (widget.match.winnerTeam != null) {
       if (widget.match.winnerTeam!.id == widget.match.teamOne.id) {
@@ -62,6 +78,9 @@ class _MatchCardState extends State<_MatchCard> {
     } else {
       _selectedWinner = null;
     }
+    
+    // Fetch available leagues
+    _fetchAvailableLeagues();
   }
 
   @override
@@ -69,6 +88,120 @@ class _MatchCardState extends State<_MatchCard> {
     _arenaController.dispose();
     _scoreController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchAvailableLeagues() async {
+    setState(() => _isLoadingLeagues = true);
+    
+    final result = await _repository.getAllLeagues();
+    result.fold(
+      (failure) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to load leagues: ${failure.message}')),
+          );
+        }
+      },
+      (success) {
+        if (mounted) {
+          setState(() {
+            _availableLeagues = success.data;
+            _isLoadingLeagues = false;
+          });
+        }
+      },
+    );
+  }
+
+  Future<void> _saveMatchUpdates() async {
+    setState(() => _isSaving = true);
+    
+    // Build update payload with only changed fields
+    final updates = <String, dynamic>{};
+    
+    // Update arena/venue
+    if (_arenaController.text != widget.match.venueName) {
+      updates['matchVenue'] = {'name': _arenaController.text};
+    }
+    
+    // Update match date/time
+    if (_selectedDateTime != widget.match.matchDateTime) {
+      updates['matchDateTime'] = _selectedDateTime.toIso8601String();
+    }
+    
+    // Update league if changed
+    if (_selectedLeagueId != null && _selectedLeagueId != widget.match.leagueId) {
+      updates['league'] = _selectedLeagueId;
+    }
+    
+    // Update score (convert score text to sets structure)
+    final scoreText = _scoreController.text.trim();
+    if (scoreText != widget.match.formattedScore()) {
+      final cleaned = scoreText.replaceAll(' ', '');
+      final parts = cleaned.split('-');
+      if (parts.length == 2) {
+        final team1Sets = int.tryParse(parts[0]) ?? 0;
+        final team2Sets = int.tryParse(parts[1]) ?? 0;
+        
+        final sets = <Map<String, dynamic>>[];
+        for (var i = 0; i < team1Sets; i++) {
+          sets.add({'teamOneGames': 1, 'teamTwoGames': 0});
+        }
+        for (var i = 0; i < team2Sets; i++) {
+          sets.add({'teamOneGames': 0, 'teamTwoGames': 1});
+        }
+        
+        updates['matchScore'] = {'sets': sets};
+      }
+    }
+    
+    // Update winner
+    if (_selectedWinner != null && _selectedWinner!.id != widget.match.winnerTeam?.id) {
+      updates['winnerTeam'] = _selectedWinner!.id;
+    }
+    
+    if (updates.isEmpty) {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No changes to save')),
+      );
+      return;
+    }
+    
+    final result = await _repository.updateMatch(widget.match.id, updates);
+    
+    result.fold(
+      (failure) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update match: ${failure.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      (success) {
+        if (mounted) {
+          setState(() => _isSaving = false);
+          
+          // Update local match object with new values
+          widget.match.venueName = _arenaController.text;
+          widget.match.matchDateTime = _selectedDateTime;
+          widget.match.updateScore(_scoreController.text);
+          widget.match.leagueName = _selectedLeague ?? widget.match.leagueName;
+          widget.match.winnerTeam = _selectedWinner;
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Match updated successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -115,28 +248,32 @@ class _MatchCardState extends State<_MatchCard> {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Image(
-                    height: 22,
-                    width: 22,
-                    image: AssetImage("assets/images/edit_icon.png"),
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      if (_isEditing) {
-                        // Save logic here (API call or state update)
-                        widget.match.venueName = _arenaController.text;
-                        widget.match.matchDateTime = _selectedDateTime;
-                        widget.match.updateScore(_scoreController.text);
-                        widget.match.leagueName = _selectedLeague ?? '';
-                        // Persist winner selection
-                        widget.match.winnerTeam = _selectedWinner;
-                      }
-                      _isEditing = !_isEditing;
-                    });
-                  },
-                ),
+                _isSaving
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : IconButton(
+                        icon: Image(
+                          height: 22,
+                          width: 22,
+                          image: AssetImage("assets/images/edit_icon.png"),
+                          color: Colors.white,
+                        ),
+                        onPressed: () async {
+                          if (_isEditing) {
+                            // Save changes via API
+                            await _saveMatchUpdates();
+                            setState(() => _isEditing = false);
+                          } else {
+                            setState(() => _isEditing = true);
+                          }
+                        },
+                      ),
               ],
             ),
 
@@ -241,30 +378,36 @@ class _MatchCardState extends State<_MatchCard> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _isEditing
-                  ? (() {
-                      //! <--- NEED TO ADD API) --->
-                      final leagues = [
-                        "Premier League",
-                        "League 2",
-                        "League 3",
-                      ];
-                      final currentValue = leagues.contains(_selectedLeague)
-                          ? _selectedLeague
-                          : null;
-                      return DropdownButtonFormField<String>(
-                        dropdownColor: Colors.black87,
-                        initialValue: currentValue,
-                        items: leagues
-                            .map(
-                              (e) => DropdownMenuItem(value: e, child: Text(e)),
-                            )
-                            .toList(),
-                        onChanged: (value) =>
-                            setState(() => _selectedLeague = value),
-                        decoration: _inputDecoration("League"),
-                        style: const TextStyle(color: Colors.white),
-                      );
-                    }())
+                  ? _isLoadingLeagues
+                      ? const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : DropdownButtonFormField<String>(
+                          dropdownColor: Colors.black87,
+                          value: _selectedLeagueId,
+                          items: _availableLeagues
+                              .map(
+                                (league) => DropdownMenuItem<String>(
+                                  value: league.id,
+                                  child: Text(
+                                    league.leagueName,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedLeagueId = value;
+                              // Update display name
+                              _selectedLeague = _availableLeagues
+                                  .firstWhere((l) => l.id == value)
+                                  .leagueName;
+                            });
+                          },
+                          decoration: _inputDecoration("League"),
+                          style: const TextStyle(color: Colors.white),
+                        )
                   : _buildDetailRow(
                       "assets/images/group_logo.png",
                       'League',
