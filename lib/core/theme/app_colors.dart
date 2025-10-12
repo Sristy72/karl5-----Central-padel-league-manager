@@ -38,5 +38,6 @@ class AppColors {
   static const Color leagueFixtureText = Color(0xFFB1B1B1);
   static const Color leagueBackgroundGrey = Color(0xFF141414);
   static const Color teamDetailsCardBackground = Color(0xFF202020);
+  static const Color teamDetailsText = Color(0xFF8E8E8E);
   //! <--- Iftikhar Close --->
 }
