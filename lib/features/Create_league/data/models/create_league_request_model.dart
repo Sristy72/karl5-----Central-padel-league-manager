@@ -24,14 +24,14 @@ class CreateLeagueRequestModel {
   });
 
   Map<String, dynamic> toJson() => {
-        'leagueName': leagueName,
-        'description': description,
-        'startDate': startDate,
-        'location': location,
-        'totalGameWeeks': totalGameWeeks,
-        'type': type,
-        'matchFormat': matchFormat,
-        'tiebreakOption': tiebreakOption,
-        'allowSubstitutes': allowSubstitutes,
-      };
+    'leagueName': leagueName,
+    'description': description,
+    'startDate': startDate,
+    'location': location,
+    'totalGameWeeks': totalGameWeeks,
+    'type': type,
+    'matchFormat': matchFormat,
+    'tiebreakOption': tiebreakOption,
+    'allowSubstitutes': allowSubstitutes,
+  };
 }

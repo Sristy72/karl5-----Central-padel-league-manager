@@ -41,30 +41,47 @@ class CreateLeagueController extends GetxController {
               // Re-read stored access token
               token = await authStorage.getAccessToken();
               if (token == null || token.isEmpty) {
-                final msg = 'Session could not be refreshed. Please login again.';
+                final msg =
+                    'Session could not be refreshed. Please login again.';
                 errorMessage(msg);
-                Get.snackbar('Authentication required', msg, snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Authentication required',
+                  msg,
+                  snackPosition: SnackPosition.BOTTOM,
+                );
                 isLoading(false);
                 return false;
               }
             } else {
               final msg = 'Session expired. Please login again.';
               errorMessage(msg);
-              Get.snackbar('Authentication required', msg, snackPosition: SnackPosition.BOTTOM);
+              Get.snackbar(
+                'Authentication required',
+                msg,
+                snackPosition: SnackPosition.BOTTOM,
+              );
               isLoading(false);
               return false;
             }
           } catch (e) {
             final msg = 'Unable to refresh session. Please login.';
             errorMessage(msg);
-            Get.snackbar('Authentication required', msg, snackPosition: SnackPosition.BOTTOM);
+            Get.snackbar(
+              'Authentication required',
+              msg,
+              snackPosition: SnackPosition.BOTTOM,
+            );
             isLoading(false);
             return false;
           }
         } else {
           final msg = 'You must be logged in to create a league.';
           errorMessage(msg);
-          Get.snackbar('Authentication required', msg, snackPosition: SnackPosition.BOTTOM);
+          Get.snackbar(
+            'Authentication required',
+            msg,
+            snackPosition: SnackPosition.BOTTOM,
+          );
           isLoading(false);
           return false;
         }
@@ -72,7 +89,11 @@ class CreateLeagueController extends GetxController {
     } catch (e) {
       final msg = 'Authentication service unavailable. Please login.';
       errorMessage(msg);
-      Get.snackbar('Authentication required', msg, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Authentication required',
+        msg,
+        snackPosition: SnackPosition.BOTTOM,
+      );
       isLoading(false);
       return false;
     }
@@ -83,15 +104,18 @@ class CreateLeagueController extends GetxController {
       bannerFile: bannerFile,
     );
 
-    return result.fold((failure) {
-      errorMessage(failure.message);
-      isLoading(false);
-      return false;
-    }, (success) {
-      successMessage(success.message);
-      isLoading(false);
-      return true;
-    });
+    return result.fold(
+      (failure) {
+        errorMessage(failure.message);
+        isLoading(false);
+        return false;
+      },
+      (success) {
+        successMessage(success.message);
+        isLoading(false);
+        return true;
+      },
+    );
   }
 
   /// Load league details by id and store in [league]
@@ -101,16 +125,19 @@ class CreateLeagueController extends GetxController {
     successMessage('');
     try {
       final result = await repository.getLeagueById(id);
-      return result.fold((failure) {
-        errorMessage(failure.message);
-        isLoading(false);
-        return false;
-      }, (success) {
-        // success.data is CreateLeagueResponseModel; its .data is LeagueModel?
-        league.value = success.data.data;
-        isLoading(false);
-        return true;
-      });
+      return result.fold(
+        (failure) {
+          errorMessage(failure.message);
+          isLoading(false);
+          return false;
+        },
+        (success) {
+          // success.data is CreateLeagueResponseModel; its .data is LeagueModel?
+          league.value = success.data.data;
+          isLoading(false);
+          return true;
+        },
+      );
     } catch (e) {
       errorMessage('Failed to load league');
       isLoading(false);
