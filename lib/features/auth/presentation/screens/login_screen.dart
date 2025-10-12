@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_karlfive223_manager/core/theme/input_decoration_extensions.dart';
 import 'package:flutter_karlfive223_manager/features/auth/presentation/screens/reset_password_screen.dart';
