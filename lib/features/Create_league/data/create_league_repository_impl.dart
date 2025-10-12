@@ -12,7 +12,8 @@ import 'dart:convert';
 class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
   final ApiClient _apiClient;
 
-  CreateLeagueRepositoryImpl({required ApiClient apiClient}) : _apiClient = apiClient;
+  CreateLeagueRepositoryImpl({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   @override
   NetworkResult<CreateLeagueResponseModel> createLeague(
@@ -27,37 +28,33 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
       // Add logo file if provided
       if (logoFile != null) {
         final filename = path.basename(logoFile.path);
-        formData.files.add(MapEntry(
-          'logo',
-          await MultipartFile.fromFile(
-            logoFile.path,
-            filename: filename,
+        formData.files.add(
+          MapEntry(
+            'logo',
+            await MultipartFile.fromFile(logoFile.path, filename: filename),
           ),
-        ));
+        );
       }
 
       // Add banner file if provided
       if (bannerFile != null) {
         final filename = path.basename(bannerFile.path);
-        formData.files.add(MapEntry(
-          'banner',
-          await MultipartFile.fromFile(
-            bannerFile.path,
-            filename: filename,
+        formData.files.add(
+          MapEntry(
+            'banner',
+            await MultipartFile.fromFile(bannerFile.path, filename: filename),
           ),
-        ));
+        );
       }
 
       // Add JSON data as a text field
-      formData.fields.add(MapEntry(
-        'data',
-        jsonEncode(request.toJson()),
-      ));
+      formData.fields.add(MapEntry('data', jsonEncode(request.toJson())));
 
       return _apiClient.post<CreateLeagueResponseModel>(
         '${ApiConstants.baseUrl}/league/create',
         data: formData,
-        fromJsonT: (json) => CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
+        fromJsonT: (json) =>
+            CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
       );
     } catch (e) {
       rethrow;
@@ -68,7 +65,8 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
   NetworkResult<CreateLeagueResponseModel> getLeagueById(String id) {
     return _apiClient.get<CreateLeagueResponseModel>(
       '${ApiConstants.baseUrl}/league/$id',
-      fromJsonT: (json) => CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
+      fromJsonT: (json) =>
+          CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
     );
   }
 }
