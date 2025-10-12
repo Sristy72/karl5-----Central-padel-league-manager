@@ -5,6 +5,7 @@ import 'package:flutter_karlfive223_manager/features/notification/presentation/s
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../controllers/create_league_controller.dart' as api_ctrl;
 import '../../data/create_league_repository.dart';
 import '../../data/models/create_league_model.dart' as form_model;
@@ -33,12 +34,19 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   final TextEditingController _leagueNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _entryfeeController = TextEditingController();
+  final TextEditingController _totalGameWeeksController = TextEditingController(
+    text: '0',
+  );
 
   File? _logoImage;
   File? _bannerImage;
+
+  // Selection state for Type, Match Format, and Tiebreak
+  String _selectedType = 'Singles';
+  String _selectedMatchFormat = 'Best of 3 sets';
+  String _selectedTiebreak = 'Standard 7-point';
+  bool _allowSubstitutes = false;
 
   Future<void> _pickImage(bool isLogo) async {
     final picker = ImagePicker();
@@ -58,9 +66,9 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.leagueBackgroundGrey,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.leagueBackgroundGrey,
         elevation: 0,
         automaticallyImplyLeading: false,
         titleSpacing: 0,
@@ -227,91 +235,6 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
             ),
             const SizedBox(height: 16),
 
-            // // Dropdown
-            // DropdownButtonFormField<String>(
-            //   dropdownColor: Colors.grey[900],
-            //   style: const TextStyle(color: Colors.white),
-            //   decoration: _fieldDecoration("Number of Teams"),
-            //   items: ["2", "4", "6", "8", "10"]
-            //       .map(
-            //         (e) => DropdownMenuItem(
-            //           value: e,
-            //           child: Text(
-            //             e,
-            //             style: const TextStyle(color: Colors.white),
-            //           ),
-            //         ),
-            //       )
-            //       .toList(),
-            //   onChanged: (val) {},
-            // ),
-            // const SizedBox(height: 16),
-
-            // // Add Teams
-            // const Text(
-            //   "Add Teams",
-            //   style: TextStyle(
-            //     color: Color(0xFFD7D7D7),
-            //     fontSize: 14,
-            //     fontWeight: FontWeight.w400,
-            //   ),
-            // ),
-            // const SizedBox(height: 8),
-
-            // Obx(
-            //   () => Column(
-            //     children: [
-            //       for (int i = 0; i < formController.teamList.length; i++)
-            //         Column(
-            //           children: [
-            //             _buildTextField("Team/Player Name"),
-            //             const SizedBox(height: 10),
-            //             _buildTextField("Contact Numbers"),
-            //             const Divider(color: Colors.white30),
-            //           ],
-            //         ),
-            //     ],
-            //   ),
-            // ),
-            // SizedBox(
-            //   width: 84,
-            //   height: 29,
-            //   child: OutlinedButton(
-            //     onPressed: formController.addTeam,
-            //     style: OutlinedButton.styleFrom(
-            //       side: const BorderSide(color: Colors.green, width: 1),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(6),
-            //       ),
-            //       padding: const EdgeInsets.symmetric(horizontal: 7),
-            //     ),
-            //     child: const Text(
-            //       "Add More +",
-            //       style: TextStyle(
-            //         color: Colors.white,
-            //         fontSize: 12,
-            //         fontWeight: FontWeight.w400,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            //
-            // const SizedBox(height: 16),
-
-            // Add Entry fee
-            // const Text(
-            //   "Add Entry Fee",
-            //   style: TextStyle(
-            //     color: Color(0xFFD7D7D7),
-            //     fontSize: 14,
-            //     fontWeight: FontWeight.w400,
-            //   ),
-            // ),
-            // const SizedBox(height: 8),
-            // _buildTextField("Write here"),
-            // const SizedBox(height: 20),
-
-            // Upload logo/photo
             const Text(
               "Upload your logo/photo",
               style: TextStyle(
@@ -343,35 +266,21 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
               children: [
                 Expanded(
                   child: _buildTextField(
-                    "Start Date",
+                    "Start Date (YYYY-MM-DD)",
                     controller: _startDateController,
                   ),
                 ),
                 const SizedBox(width: 18),
                 Expanded(
                   child: _buildTextField(
-                    "End Date",
-                    controller: _endDateController,
+                    "Total Game Weeks",
+                    controller: _totalGameWeeksController,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             _buildTextField("Location", controller: _locationController),
-
-
-            const SizedBox(height: 20),
-            const Text(
-              "Add Entry Fee",
-              style: TextStyle(
-                color: Color(0xFFD7D7D7),
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-            _buildTextField("Write here", controller: _entryfeeController),
 
             const SizedBox(height: 24),
 
@@ -387,9 +296,18 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   height: 29,
                   width: 116,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedType = 'Singles';
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2AAF08),
+                      backgroundColor: _selectedType == 'Singles'
+                          ? Color(0xFF2AAF08)
+                          : Colors.black,
+                      side: _selectedType == 'Singles'
+                          ? null
+                          : const BorderSide(color: Color(0xFF2AAF08)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -407,10 +325,18 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   height: 29,
                   width: 116,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedType = 'Doubles';
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      side: const BorderSide(color: Color(0xFF2AAF08)),
+                      backgroundColor: _selectedType == 'Doubles'
+                          ? Color(0xFF2AAF08)
+                          : Colors.black,
+                      side: _selectedType == 'Doubles'
+                          ? null
+                          : const BorderSide(color: Color(0xFF2AAF08)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -427,7 +353,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
 
             const SizedBox(height: 16),
 
-            // Tiebreak Option
+            // Match Format
             const Text(
               "Match Format:",
               style: TextStyle(color: Colors.white, fontSize: 14),
@@ -439,9 +365,18 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   height: 29,
                   width: 116,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedMatchFormat = 'Best of 3 sets';
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2AAF08),
+                      backgroundColor: _selectedMatchFormat == 'Best of 3 sets'
+                          ? Color(0xFF2AAF08)
+                          : Colors.black,
+                      side: _selectedMatchFormat == 'Best of 3 sets'
+                          ? null
+                          : const BorderSide(color: Color(0xFF2AAF08)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -458,10 +393,18 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   height: 29,
                   width: 116,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedMatchFormat = 'Best of 5 sets';
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      side: const BorderSide(color: Color(0xFF2AAF08)),
+                      backgroundColor: _selectedMatchFormat == 'Best of 5 sets'
+                          ? Color(0xFF2AAF08)
+                          : Colors.black,
+                      side: _selectedMatchFormat == 'Best of 5 sets'
+                          ? null
+                          : const BorderSide(color: Color(0xFF2AAF08)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -478,7 +421,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
 
             const SizedBox(height: 16),
 
-            // Auto Assign Dates & Times
+            // Tiebreak Option
             const Text(
               "Tiebreak Option",
               style: TextStyle(color: Colors.white, fontSize: 14),
@@ -490,9 +433,18 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   height: 29,
                   width: 116,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedTiebreak = 'Standard 7-point';
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2AAF08),
+                      backgroundColor: _selectedTiebreak == 'Standard 7-point'
+                          ? Color(0xFF2AAF08)
+                          : Colors.black,
+                      side: _selectedTiebreak == 'Standard 7-point'
+                          ? null
+                          : const BorderSide(color: Color(0xFF2AAF08)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -509,10 +461,18 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   height: 29,
                   width: 116,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _selectedTiebreak = 'No tiebreak';
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      side: const BorderSide(color: Color(0xFF2AAF08)),
+                      backgroundColor: _selectedTiebreak == 'No tiebreak'
+                          ? Color(0xFF2AAF08)
+                          : Colors.black,
+                      side: _selectedTiebreak == 'No tiebreak'
+                          ? null
+                          : const BorderSide(color: Color(0xFF2AAF08)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -530,29 +490,38 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
             const SizedBox(height: 24),
 
             // Allow substitutes
-            Row(
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.green, width: 1),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.circle,
-                      size: 10,
-                      color: Colors.transparent,
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _allowSubstitutes = !_allowSubstitutes;
+                });
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.green, width: 1),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.circle,
+                        size: 10,
+                        color: _allowSubstitutes
+                            ? Colors.green
+                            : Colors.transparent,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  "Allow players substitutes",
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  const Text(
+                    "Allow players substitutes",
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 16),
@@ -673,19 +642,20 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
           final l = apiController.league.value!;
           _leagueNameController.text = l.leagueName;
           _descriptionController.text = l.description;
-          // use ISO date strings for inputs; format as yyyy-MM-dd for readability
-          if (l.startDate != null) _startDateController.text = l.startDate!.toIso8601String();
-          if (l.endDate != null) _endDateController.text = l.endDate!.toIso8601String();
+          if (l.startDate != null) {
+            _startDateController.text = l.startDate!.toIso8601String().split(
+              'T',
+            )[0];
+          }
           _locationController.text = l.location;
-          if (l.price != null) _entryfeeController.text = l.price!;
-
-          // populate team list using ids as names (backend returns ids)
-          formController.teamList.assignAll(
-            l.addTeams.map((id) => {"name": id, "contact": ""}).toList(),
-          );
+          // Note: API doesn't provide totalGameWeeks, type, matchFormat, tiebreakOption in response
           setState(() {});
         } else {
-          Get.snackbar('Error', apiController.errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+          Get.snackbar(
+            'Error',
+            apiController.errorMessage.value,
+            snackPosition: SnackPosition.BOTTOM,
+          );
         }
       });
     }
@@ -815,39 +785,120 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     _leagueNameController.dispose();
     _descriptionController.dispose();
     _startDateController.dispose();
-    _endDateController.dispose();
     _locationController.dispose();
+    _totalGameWeeksController.dispose();
     super.dispose();
   }
 
   void _onCreatePressed() async {
+    // Validate required fields
+    if (_leagueNameController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter a league name',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (_descriptionController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter a description',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (_startDateController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter a start date',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (_locationController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter a location',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // Parse total game weeks
+    int totalGameWeeks = 0;
+    try {
+      totalGameWeeks = int.parse(_totalGameWeeksController.text.trim());
+    } catch (e) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter a valid number for total game weeks',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // Format start date to ISO 8601 format
+    String formattedStartDate;
+    try {
+      final dateParts = _startDateController.text.trim().split('-');
+      if (dateParts.length == 3) {
+        final year = int.parse(dateParts[0]);
+        final month = int.parse(dateParts[1]);
+        final day = int.parse(dateParts[2]);
+        formattedStartDate = DateTime(year, month, day).toIso8601String();
+      } else {
+        throw FormatException('Invalid date format');
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter date in YYYY-MM-DD format',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     final request = CreateLeagueRequestModel(
-      user: '68d10f55d487a29db7269da7', // TODO: replace with actual user id
-      leagueName: _leagueNameController.text,
-      description: _descriptionController.text,
-      startDate: _startDateController.text,
-      endDate: _endDateController.text,
-      location: _locationController.text,
-      addTeams: formController.teamList.map((e) => e['name'] ?? '').toList(),
-      totalGameWeeks: 0,
-      type: 'Singles',
-      matchFormat: 'Best of 3 sets',
-      tiebreakOption: 'No tiebreak',
-      allowSubstitutes: false,
+      user:
+          '68d10f55d487a29db7269da7', // TODO: replace with actual user id from auth
+      leagueName: _leagueNameController.text.trim(),
+      description: _descriptionController.text.trim(),
+      startDate: formattedStartDate,
+      location: _locationController.text.trim(),
+      totalGameWeeks: totalGameWeeks,
+      type: _selectedType,
+      matchFormat: _selectedMatchFormat,
+      tiebreakOption: _selectedTiebreak,
+      allowSubstitutes: _allowSubstitutes,
     );
 
-    final success = await apiController.createLeague(request);
+    final success = await apiController.createLeague(
+      request,
+      logoFile: _logoImage,
+      bannerFile: _bannerImage,
+    );
+
     if (success) {
       Get.snackbar(
         'Success',
-        apiController.successMessage.value,
+        'League created successfully!',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
       );
+      // Optionally navigate back or clear form
+      Get.back();
     } else {
       Get.snackbar(
         'Error',
         apiController.errorMessage.value,
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }

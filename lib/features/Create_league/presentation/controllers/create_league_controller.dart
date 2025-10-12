@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:get/get.dart';
 import '../../../../core/network/services/auth_storage_service.dart';
 import '../../data/create_league_repository.dart';
@@ -15,7 +16,11 @@ class CreateLeagueController extends GetxController {
   var errorMessage = ''.obs;
   var league = Rxn<LeagueModel>();
 
-  Future<bool> createLeague(CreateLeagueRequestModel request) async {
+  Future<bool> createLeague(
+    CreateLeagueRequestModel request, {
+    File? logoFile,
+    File? bannerFile,
+  }) async {
     isLoading(true);
     errorMessage('');
     successMessage('');
@@ -72,7 +77,11 @@ class CreateLeagueController extends GetxController {
       return false;
     }
 
-    final result = await repository.createLeague(request);
+    final result = await repository.createLeague(
+      request,
+      logoFile: logoFile,
+      bannerFile: bannerFile,
+    );
 
     return result.fold((failure) {
       errorMessage(failure.message);
