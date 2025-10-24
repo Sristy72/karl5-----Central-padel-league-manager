@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../team_details/data/models/team_model.dart';
 import '../../../team_details/domain/repo/team_repo.dart';
 
+
 class TeamController extends GetxController {
   final TeamRepo _repo;
   TeamController({required TeamRepo repo}) : _repo = repo;

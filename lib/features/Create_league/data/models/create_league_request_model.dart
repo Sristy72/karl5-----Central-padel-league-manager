@@ -5,6 +5,7 @@ class CreateLeagueRequestModel {
   final String startDate;
   final String? endDate;
   final String location;
+  final String? price;
   final int totalGameWeeks;
   final String type;
   final String matchFormat;
@@ -23,6 +24,7 @@ class CreateLeagueRequestModel {
     required this.matchFormat,
     required this.tiebreakOption,
     required this.allowSubstitutes,
+    required this.price,
   });
 
   Map<String, dynamic> toJson() => {
@@ -35,5 +37,6 @@ class CreateLeagueRequestModel {
     'matchFormat': matchFormat,
     'tiebreakOption': tiebreakOption,
     'allowSubstitutes': allowSubstitutes,
+    if (price != null && price!.isNotEmpty) 'price': price,
   };
 }

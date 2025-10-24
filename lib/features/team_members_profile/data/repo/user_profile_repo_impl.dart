@@ -1,8 +1,8 @@
-import '../../../../core/network/api_client.dart';
 import '../../../../core/network/constants/api_constants.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/network/network_result.dart';
-import '../../data/models/user_profile_model.dart';
 import '../../domain/repo/user_profile_repo.dart';
+import '../models/user_profile_model.dart';
 
 class UserProfileRepoImpl implements UserProfileRepo {
   final ApiClient _apiClient;

@@ -38,9 +38,10 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _totalGameWeeksController = TextEditingController(
-    text: '0',
-  );
+  final TextEditingController _totalGameWeeksController = TextEditingController(text: '0',);
+  final TextEditingController _entryFeeController = TextEditingController();
+
+
 
   File? _logoImage;
   File? _bannerImage;
@@ -119,7 +120,39 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
               onSelectDate: () => _selectDate(context),
             ),
 
+            const SizedBox(height: 8),
+
+          // New Entry Fee Field
+
+            TextField(
+              controller: _entryFeeController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Add Entry Fee",
+                hintStyle: const TextStyle(
+                  color: Color(0xFFCACACA),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+                filled: true,
+                fillColor: Colors.grey[900],
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: const BorderSide(color: Colors.white30),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: const BorderSide(color: Colors.green),
+                ),
+              ),
+            ),
+
+
+
             const SizedBox(height: 24),
+
+
+
 
             CreateLeagueSelectionButtons(
               selectedType: _selectedType,
@@ -226,6 +259,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     _startDateController.dispose();
     _locationController.dispose();
     _totalGameWeeksController.dispose();
+    _entryFeeController.dispose();
     super.dispose();
   }
 
@@ -237,6 +271,18 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       location: _locationController.text,
       totalGameWeeks: _totalGameWeeksController.text,
     )) {
+      return;
+    }
+
+    // Entry Fee validation
+    if (_entryFeeController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter an entry fee',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       return;
     }
 
@@ -278,6 +324,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       matchFormat: _selectedMatchFormat,
       tiebreakOption: _selectedTiebreak,
       allowSubstitutes: _allowSubstitutes,
+      price: _entryFeeController.text.trim(),
     );
 
     final success = await apiController.createLeague(
@@ -313,6 +360,8 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     _startDateController.clear();
     _locationController.clear();
     _totalGameWeeksController.text = '0';
+    _entryFeeController.clear();
+
     setState(() {
       _logoImage = null;
       _bannerImage = null;

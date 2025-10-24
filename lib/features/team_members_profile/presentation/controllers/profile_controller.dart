@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../data/models/user_profile_model.dart';
 import '../../domain/repo/user_profile_repo.dart';
 
+
 class ProfileController extends GetxController {
   final UserProfileRepo repository;
 

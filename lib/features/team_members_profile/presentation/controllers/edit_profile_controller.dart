@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:get/get.dart';
-
 import '../../../../core/network/services/multiple_form_data_manager.dart';
 import '../../../EntireScreen/domain/repo/user_info_repo.dart';
 

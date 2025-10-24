@@ -25,7 +25,7 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
     try {
       final formData = FormData();
 
-      // ✅ Text fields (match Postman one-to-one)
+      // Text fields (match Postman one-to-one)
       formData.fields.addAll([
         MapEntry('user', request.user),
         MapEntry('leagueName', request.leagueName),
@@ -39,6 +39,8 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
         MapEntry('tiebreakOption', request.tiebreakOption),
         MapEntry('allowSubstitutes', request.allowSubstitutes.toString()),
         MapEntry('totalGameWeeks', request.totalGameWeeks.toString()),
+        MapEntry('price', request.price ?? ''),
+
       ]);
 
       // Logo (file)
