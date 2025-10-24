@@ -25,6 +25,8 @@ class ApiConstants {
   static UserEndpoints get user => UserEndpoints();
   static ContactEndpoints get contact => ContactEndpoints();
   static NotificationEndpoints get notification => NotificationEndpoints();
+  static ReportEndpoints get report => ReportEndpoints();
+
 
   static get team => null;
 
@@ -62,3 +64,15 @@ class ContactEndpoints {
   static const String _base = '${ApiConstants.baseUrl}/contact';
   final String createContact = '$_base/create';
 }
+
+class ReportEndpoints {
+  static const String _base = '${ApiConstants.baseUrl}/report';
+
+  /// Create a report (POST)
+  final String createReport = '$_base/create';
+
+  /// Optional — in case backend supports fetching user reports later
+  final String getReports = '$_base/all';
+}
+
+

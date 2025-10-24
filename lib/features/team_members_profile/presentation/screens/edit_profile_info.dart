@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_karlfive223_manager/features/team_members_profile/presentation/screens/profile_info_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
 
 import '../../data/models/edit_profile_model.dart';
+import '../../data/models/team_member_model.dart';
 import '../controllers/edit_profile_controller.dart';
 import '../controllers/profile_controller.dart';
-
 
 class EditProfileInfoScreen extends StatefulWidget {
   final EditProfileModel member;
@@ -23,6 +24,7 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
+
   String _selectedGender = "";
   File? _pickedImage;
   late final EditProfileController _controller;
@@ -30,12 +32,12 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
   @override
   void initState() {
     super.initState();
-    _birthdayController = TextEditingController(text: widget.member.birthday);
+    _birthdayController = TextEditingController();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
     _selectedGender = widget.member.gender;
-    _firstNameController = TextEditingController(text: widget.member.firstName);
-    _lastNameController = TextEditingController(text: widget.member.lastName);
-    _emailController = TextEditingController(text: widget.member.email);
-    _phoneController = TextEditingController(text: widget.member.phone);
     _controller = Get.find<EditProfileController>();
   }
 
@@ -52,7 +54,7 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
   // Date Picker
   Future<void> _selectDate() async {
     DateTime initialDate =
-        DateTime.tryParse(_birthdayController.text) ?? DateTime.now();
+        DateTime.tryParse(widget.member.birthday) ?? DateTime.now();
 
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -65,7 +67,10 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
             colorScheme: const ColorScheme.dark(
               primary: Colors.blue,
               onSurface: Colors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: Colors.black),
+            ),
+            dialogTheme: const DialogThemeData(
+              backgroundColor: Colors.black,
+            ),
           ),
           child: child!,
         );
@@ -79,6 +84,7 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
       });
     }
   }
+
 
   // Image Picker
   Future<void> _pickImage(ImageSource source) async {
@@ -105,7 +111,7 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
             ListTile(
               leading: const Icon(Icons.photo, color: Colors.green),
               title: const Text("Gallery"),
-                onTap: () {
+              onTap: () {
                 _pickImage(ImageSource.gallery);
                 Get.back();
               },
@@ -124,8 +130,21 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
     );
   }
 
+  // Clear all form fields after saving
+  void _clearForm() {
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _birthdayController.clear();
+    _selectedGender = "";
+    _pickedImage = null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final member = widget.member;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -143,23 +162,20 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-          const EdgeInsets.only(top: 22, left: 24, right: 24, bottom: 24),
+          padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              // Profile Image with picker
+              // 🖼 Profile Image
               GestureDetector(
                 onTap: _showImagePickerDialog,
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: _pickedImage != null
-                          ? FileImage(_pickedImage!)
-                          : AssetImage(widget.member.imageUrl) as ImageProvider,
-                    ),
-                  ],
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: _pickedImage != null
+                      ? FileImage(_pickedImage!)
+                      : (member.imageUrl.isNotEmpty
+                      ? AssetImage(member.imageUrl)
+                      : const AssetImage('assets/images/profile.png'))
+                  as ImageProvider,
                 ),
               ),
               const SizedBox(height: 20),
@@ -170,7 +186,9 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                   Expanded(
                     child: _buildTextField(
                       label: "First Name",
-                      hintText: "Ken",
+                      hintText: member.firstName.isNotEmpty
+                          ? member.firstName
+                          : "Enter first name",
                       controller: _firstNameController,
                     ),
                   ),
@@ -178,7 +196,9 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                   Expanded(
                     child: _buildTextField(
                       label: "Last Name",
-                      hintText: "Adams",
+                      hintText: member.lastName.isNotEmpty
+                          ? member.lastName
+                          : "Enter last name",
                       controller: _lastNameController,
                     ),
                   ),
@@ -189,7 +209,8 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
               // Email
               _buildTextField(
                 label: "Email",
-                hintText: "Enter Email",
+                hintText:
+                member.email.isNotEmpty ? member.email : "Enter email",
                 controller: _emailController,
               ),
               const SizedBox(height: 16),
@@ -197,12 +218,13 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
               // Phone
               _buildTextField(
                 label: "Phone",
-                hintText: "Enter Phone Number",
+                hintText:
+                member.phone.isNotEmpty ? member.phone : "Enter phone",
                 controller: _phoneController,
               ),
               const SizedBox(height: 16),
 
-              // Birthday with calendar icon
+              // Birthday
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -223,7 +245,9 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                       style:
                       const TextStyle(color: Colors.white, fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: "29/02/2000",
+                        hintText: member.birthday.isNotEmpty
+                            ? member.birthday
+                            : "Select your birthday",
                         hintStyle: const TextStyle(
                             color: Color(0xFF7D807D), fontSize: 16),
                         isDense: true,
@@ -270,10 +294,12 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                   SizedBox(
                     height: 38,
                     child: DropdownButtonFormField<String>(
-                      initialValue:
-                      _selectedGender.isNotEmpty ? _selectedGender : null,
+                      value: _selectedGender.isNotEmpty
+                          ? _selectedGender
+                          : null,
                       dropdownColor: Colors.black,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style:
+                      const TextStyle(color: Colors.white, fontSize: 14),
                       icon: const Icon(Icons.keyboard_arrow_down_sharp,
                           color: Color(0xFF7D807D)),
                       decoration: InputDecoration(
@@ -326,30 +352,51 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                       ),
                     ),
                     onPressed: () async {
-                      final firstName = _firstNameController.text;
-                      final lastName = _lastNameController.text;
-                      final email = _emailController.text;
-                      final phone = _phoneController.text;
-                      final birthday = _birthdayController.text;
-                      final gender = _selectedGender;
-
                       final success = await _controller.updateProfile(
-                        firstName: firstName,
-                        lastName: lastName,
-                        email: email,
-                        phone: phone,
-                        birthday: birthday,
-                        gender: gender,
+                        firstName: _firstNameController.text,
+                        lastName: _lastNameController.text,
+                        email: _emailController.text,
+                        phone: _phoneController.text,
+                        birthday: _birthdayController.text,
+                        gender: _selectedGender,
                         image: _pickedImage,
                       );
 
                       if (success) {
-                        // Refresh global profile data so profile screen shows updates
+                        // Clear all form fields
+                        _clearForm();
+
+                        // Refresh profile data
                         final profileCtrl = Get.find<ProfileController>();
                         await profileCtrl.fetchProfile();
-                        Get.back();
+
+                        // Navigate back to ProfileInfoScreen using same transition style
+                        Get.offAll(
+                              () => ProfileInfoScreen(
+                            member: TeamMemberModel(
+                              id: '', // you can pass actual id if you have it
+                              name: '${_firstNameController.text} ${_lastNameController.text}',
+                              role: 'Player', // or 'Manager' or whatever fits your app
+                              imageUrl: _pickedImage?.path ?? widget.member.imageUrl,
+                              matches: 0,
+                              level: 0,
+                              firstName: _firstNameController.text,
+                              lastName: _lastNameController.text,
+                              email: _emailController.text,
+                              phone: _phoneController.text,
+                              birthday: _birthdayController.text,
+                              gender: _selectedGender,
+                            ),
+                          ),
+                          transition: Transition.fadeIn,
+                          duration: const Duration(milliseconds: 50),
+                        );
+
+
                       }
                     },
+
+
                     child: const Text(
                       "Save",
                       style: TextStyle(
@@ -371,31 +418,26 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
   Widget _buildTextField({
     required String label,
     required String hintText,
-    String? initialValue,
     TextEditingController? controller,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label
-        Text(
-          label,
-          style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w400),
-        ),
+        Text(label,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w400)),
         const SizedBox(height: 4),
         SizedBox(
           height: 38,
           child: TextFormField(
             controller: controller,
-            initialValue: controller == null ? initialValue : null,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: const TextStyle(
-                  color: Color(0xFF7D807D), fontSize: 16),
+              hintStyle:
+              const TextStyle(color: Color(0xFF7D807D), fontSize: 16),
               isDense: true,
               contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

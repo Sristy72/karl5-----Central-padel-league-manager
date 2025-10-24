@@ -3,13 +3,23 @@ import 'package:flutter_karlfive223_manager/features/team_members_profile/presen
 import 'package:flutter_karlfive223_manager/features/team_members_profile/presentation/screens/profile_report_screen.dart';
 import 'package:get/get.dart';
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../EntireScreen/data/repo/user_info_repo_impl.dart';
+import '../../../EntireScreen/domain/repo/user_info_repo.dart';
 import '../../../auth/presentation/controller/auth_controller.dart';
 import '../../../privacy_policy/presentation/screens/privacy_pilicy_screen.dart';
 import '../../../team_details/presentation/controllers/team_controller.dart';
 import '../../../team_details/presentation/screens/team_details_screens.dart';
 import '../../data/models/edit_profile_model.dart';
 import '../../data/models/team_member_model.dart';
+import '../../data/repo/contact_us_repo_impl.dart';
+import '../../data/repo/report_repo_impl.dart';
+import '../../domain/repo/contact_us_repo.dart';
+import '../../domain/repo/report_repo.dart';
+import '../controllers/contact_us_controller.dart';
+import '../controllers/edit_profile_controller.dart';
 import '../controllers/profile_controller.dart';
+import '../controllers/report_controller.dart';
 import 'edit_profile_info.dart';
 
 
@@ -63,9 +73,17 @@ class ProfileInfoScreen extends StatelessWidget {
               );
 
               // Navigate to edit screen and refresh profile when returning
-              Get.to(EditProfileInfoScreen(member: editModel))?.then((_) async {
+              final apiClient = Get.find<ApiClient>();
+              if (!Get.isRegistered<UserInfoRepo>()) {
+                Get.put<UserInfoRepo>(UserInfoRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<EditProfileController>()) {
+                Get.put(EditProfileController(Get.find<UserInfoRepo>()));
+              }
+              Get.to(() => EditProfileInfoScreen(member: editModel))?.then((_) async {
                 await controller.fetchProfile();
               });
+
             },
             icon: Image.asset(
               'assets/icons/profile_Edit.png',
@@ -292,9 +310,16 @@ class ProfileInfoScreen extends StatelessWidget {
                             gender: "Male",
                             imageUrl: member.imageUrl,
                           );
-                          Get.to(
-                                () => ProfileContactUsScreen(member: editProfile),
-                          );
+                          final apiClient = Get.find<ApiClient>();
+                          if (!Get.isRegistered<ContactUsRepo>()) {
+                            Get.put<ContactUsRepo>(ContactUsRepoImpl(apiClient: apiClient));
+                          }
+                          if (!Get.isRegistered<ContactUsController>()) {
+                            Get.put(ContactUsController(Get.find<ContactUsRepo>()));
+                          }
+
+                          Get.to(() => ProfileContactUsScreen(member: editProfile));
+
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -344,7 +369,16 @@ class ProfileInfoScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       InkWell(
                         onTap: () {
+                          final apiClient = Get.find<ApiClient>();
+                          if (!Get.isRegistered<ReportRepo>()) {
+                            Get.put<ReportRepo>(ReportRepoImpl(apiClient: apiClient));
+                          }
+                          if (!Get.isRegistered<ReportController>()) {
+                            Get.put(ReportController(Get.find<ReportRepo>()));
+                          }
+
                           Get.to(() => const ProfileReportScreen());
+
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
