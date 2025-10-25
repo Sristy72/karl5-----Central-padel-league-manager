@@ -126,42 +126,49 @@ class AppBottomNavBar extends StatelessWidget {
                 gender: '',
               );
 
-              // Initialize controllers if not already initialized
-              if (!Get.isRegistered<ProfileController>() ||
-                  !Get.isRegistered<TeamController>() ||
-                  !Get.isRegistered<ContactUsController>()) {
-                // Get the API client from GetX
-                final apiClient = Get.find<ApiClient>();
-
-                // Initialize Profile Controller
-                if (!Get.isRegistered<ProfileController>()) {
-                  final userProfileRepo = Get.put(
-                    UserProfileRepoImpl(apiClient: apiClient),
-                  );
-                  Get.put(ProfileController(repository: userProfileRepo));
-                }
-
-                // Initialize Team Controller
-                if (!Get.isRegistered<TeamController>()) {
-                  final teamRepo = Get.put(TeamRepoImpl(apiClient: apiClient));
-                  Get.put(TeamController(repo: teamRepo));
-                }
-
-                // Initialize Contact Us Controller
-                if (!Get.isRegistered<ContactUsController>()) {
-                  final contactUsRepo = Get.put(
-                    ContactUsRepoImpl(apiClient: apiClient),
-                  );
-                  Get.put(ContactUsController(contactUsRepo));
-                }
+              // Safe initialize dependencies without touching core
+              ApiClient apiClient;
+              if (Get.isRegistered<ApiClient>()) {
+                apiClient = Get.find<ApiClient>();
+              } else {
+                apiClient = Get.put(ApiClient());
               }
 
+              // Ensure UserProfileRepo + ProfileController
+              if (!Get.isRegistered<UserProfileRepoImpl>()) {
+                Get.put(UserProfileRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<ProfileController>()) {
+                Get.put(
+                  ProfileController(repository: Get.find<UserProfileRepoImpl>()),
+                  permanent: true,
+                );
+              }
+
+              // Ensure TeamRepo + TeamController
+              if (!Get.isRegistered<TeamRepoImpl>()) {
+                Get.put(TeamRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<TeamController>()) {
+                Get.put(TeamController(repo: Get.find<TeamRepoImpl>()));
+              }
+
+              // Ensure ContactUsRepo + ContactUsController
+              if (!Get.isRegistered<ContactUsRepoImpl>()) {
+                Get.put(ContactUsRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<ContactUsController>()) {
+                Get.put(ContactUsController(Get.find<ContactUsRepoImpl>()));
+              }
+
+              // Finally navigate
               Get.offAll(
-                () => ProfileInfoScreen(member: defaultMember),
+                    () => ProfileInfoScreen(member: defaultMember),
                 transition: Transition.fadeIn,
                 duration: const Duration(milliseconds: 50),
               );
             }
+
           },
           backgroundColor: Colors.transparent,
           elevation: 0,

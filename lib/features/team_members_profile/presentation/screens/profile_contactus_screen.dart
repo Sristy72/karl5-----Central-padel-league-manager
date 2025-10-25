@@ -245,8 +245,8 @@ class ProfileContactUsScreen extends StatelessWidget {
     );
   }
 
-  // Submit form method
-  void _submitForm() {
+// Submit Form
+  void _submitForm() async {
     final firstName = firstNameController.text.trim();
     final lastName = lastNameController.text.trim();
     final address = addressController.text.trim();
@@ -261,7 +261,9 @@ class ProfileContactUsScreen extends StatelessWidget {
     }
 
     controller.clearError();
-    controller.createContact(
+
+    // Call API
+    final success = await controller.createContact(
       firstName: firstName,
       lastName: lastName,
       address: address,
@@ -269,7 +271,47 @@ class ProfileContactUsScreen extends StatelessWidget {
       subject: subject,
       yourCompany: yourCompany,
     );
+
+    if (success) {
+      // Success Snackbar
+      Get.snackbar(
+        "Message Sent",
+        "Your message has been sent successfully!",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade600,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+
+      // Clear all fields
+      firstNameController.clear();
+      lastNameController.clear();
+      addressController.clear();
+      phoneNumberController.clear();
+      subjectController.clear();
+      yourCompanyController.clear();
+
+      // Optional: go back to previous screen after delay
+      await Future.delayed(const Duration(seconds: 2));
+      if (Get.isOverlaysClosed == false && Get.currentRoute != "/ProfileInfoScreen") {
+        Get.back(); // navigate back to ProfileInfoScreen
+      }
+    } else {
+      // Error Snackbar (optional)
+      Get.snackbar(
+        "Failed",
+        controller.errorMessage.isNotEmpty
+            ? controller.errorMessage.value
+            : "Something went wrong. Please try again.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade700,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+    }
   }
+
 
   // Reusable TextField Builder with controller
   Widget _buildTextField({

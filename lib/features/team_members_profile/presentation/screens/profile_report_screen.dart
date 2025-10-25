@@ -32,14 +32,34 @@ class _ProfileReportScreenState extends State<ProfileReportScreen> {
     }
   }
 
-  void _submitReport() async {
-    reportController.createReport(
+  Future<void> _submitReport() async {
+    await reportController.createReport(
       userId: "68ccd4854f2b792c1ee5a84a",
-      even: eventController.text,
-      description: descriptionController.text,
+      even: eventController.text.trim(),
+      description: descriptionController.text.trim(),
       imageFile: _selectedImage,
     );
+
+    // If successful, clear fields and image
+    if (!reportController.isLoading.value) {
+      eventController.clear();
+      descriptionController.clear();
+      setState(() {
+        _selectedImage = null;
+      });
+
+      Get.snackbar(
+        "Report Sent",
+        "Your report has been submitted successfully!",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade600,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {

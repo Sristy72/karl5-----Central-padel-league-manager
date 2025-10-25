@@ -8,7 +8,7 @@ class ContactUsController extends BaseController {
 
   ContactUsController(this._contactUsRepo);
 
-  Future<void> createContact({
+  Future<bool> createContact({
     required String firstName,
     required String lastName,
     required String address,
@@ -16,24 +16,41 @@ class ContactUsController extends BaseController {
     required String subject,
     required String yourCompany,
   }) async {
-    final request = ContactUsRequestModel(
-      firstName: firstName,
-      lastName: lastName,
-      address: address,
-      phoneNumber: phoneNumber,
-      subject: subject,
-      yourCompony: yourCompany,
-    );
-    DPrint.log("Contact Us create data : ${request.toJson()}");
+    try {
+      isLoading.value = true;
 
-    final result = await _contactUsRepo.createContact(request);
-    
-    result.fold((fail) {
-      DPrint.log("concat us create fail : ${fail.message}");
-    }, (success) {
-      DPrint.log("concat us create success : ${success.message}");
+      final request = ContactUsRequestModel(
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        phoneNumber: phoneNumber,
+        subject: subject,
+        yourCompony: yourCompany,
+      );
 
-    });
+      DPrint.log("Contact Us request: ${request.toJson()}");
 
+      final result = await _contactUsRepo.createContact(request);
+
+      bool success = false;
+
+      result.fold(
+            (fail) {
+          DPrint.log("Contact us failed: ${fail.message}");
+          setError(fail.message);
+        },
+            (res) {
+          DPrint.log("Contact us success: ${res.message}");
+          success = true;
+        },
+      );
+
+      return success;
+    } catch (e) {
+      DPrint.log("⚠️ ContactUsController Exception: $e");
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
