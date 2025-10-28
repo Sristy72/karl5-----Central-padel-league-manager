@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_karlfive223_manager/features/Create_league/presentation/screens/create_league_screen.dart';
 import 'package:get/get.dart';
+
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
+import '../../../../core/common/widgets/shimmer_widgets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../controller/home_controller.dart';
 import '../widgets/custom_search_bar.dart';
@@ -82,6 +84,36 @@ class HomeScreen extends StatelessWidget {
 
                   if (controller.isSearching.value) {
                     return const SearchResultsWidget();
+                  }
+
+                  // Show shimmer loaders while loading
+                  if (controller.isLoading.value) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Text(
+                            "Game Reminder",
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        GameReminderShimmer(),
+                        SizedBox(height: 20),
+                        LeagueUpdateShimmer(),
+                        SizedBox(height: 20),
+                        NextMatchShimmer(),
+                        SizedBox(height: 20),
+                        QuickStatsShimmer(),
+                        SizedBox(height: 20),
+                        FixturesShimmer(),
+                      ],
+                    );
                   }
 
                   return Column(

@@ -1,26 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_karlfive223_manager/features/team_members_profile/presentation/screens/profile_contactus_screen.dart';
+import 'package:flutter_karlfive223_manager/features/team_members_profile/presentation/screens/profile_report_screen.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
+import '../../../../core/common/widgets/shimmer_widgets.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../EntireScreen/data/repo/user_info_repo_impl.dart';
+import '../../../EntireScreen/domain/repo/user_info_repo.dart';
 import '../../../auth/presentation/controller/auth_controller.dart';
-import '../../../auth/presentation/screens/login_screen.dart';
 import '../../../privacy_policy/presentation/screens/privacy_pilicy_screen.dart';
-import '../../models/edit_profile_model.dart';
-import '../../models/team_member_model.dart';
+import '../../../team_details/domain/repo/team_repo.dart';
+import '../../../team_details/presentation/controllers/team_controller.dart';
+import '../../data/models/edit_profile_model.dart';
+import '../../data/models/team_member_model.dart';
+import '../../data/repo/contact_us_repo_impl.dart';
+import '../../data/repo/report_repo_impl.dart';
+import '../../domain/repo/contact_us_repo.dart';
+import '../../domain/repo/report_repo.dart';
+import '../controllers/contact_us_controller.dart';
+import '../controllers/edit_profile_controller.dart';
+import '../controllers/profile_controller.dart';
+import '../controllers/report_controller.dart';
 import 'edit_profile_info.dart';
-import 'profile_contactus_screen.dart';
-import 'profile_report_screen.dart';
+
+
 
 class ProfileInfoScreen extends StatelessWidget {
   final TeamMemberModel member;
 
   const ProfileInfoScreen({super.key, required this.member});
 
+
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ProfileController>();
+    // Ensure a TeamController exists — when navigating back from edit screen
+    // the app bottom nav initializers may not have run, so create it lazily here.
+    late final TeamController teamCtrl;
+    if (Get.isRegistered<TeamController>()) {
+      teamCtrl = Get.find<TeamController>();
+    } else {
+      // TeamRepo should be registered by setupRepository; use that repo instance
+      // to construct the TeamController lazily for this screen only.
+      teamCtrl = Get.put(TeamController(repo: Get.find<TeamRepo>()));
+    }
+
+    // If profile has a linked team id, fetch team data so TeamDetailsScreen is ready.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final teamId = controller.profile.value?.clubAffiliation;
+      if (teamId != null && teamId.isNotEmpty && teamCtrl.team.value == null && !teamCtrl.isLoading.value) {
+        teamCtrl.fetchTeam(teamId);
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+
         backgroundColor: Colors.black,
         elevation: 0,
         title: const Text(
@@ -46,7 +83,18 @@ class ProfileInfoScreen extends StatelessWidget {
                 imageUrl: member.imageUrl,
               );
 
-              Get.to(EditProfileInfoScreen(member: editModel));
+              // Navigate to edit screen and refresh profile when returning
+              final apiClient = Get.find<ApiClient>();
+              if (!Get.isRegistered<UserInfoRepo>()) {
+                Get.put<UserInfoRepo>(UserInfoRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<EditProfileController>()) {
+                Get.put(EditProfileController(Get.find<UserInfoRepo>()));
+              }
+              Get.to(() => EditProfileInfoScreen(member: editModel))?.then((_) async {
+                await controller.fetchProfile();
+              });
+
             },
             icon: Image.asset(
               'assets/icons/profile_Edit.png',
@@ -58,28 +106,44 @@ class ProfileInfoScreen extends StatelessWidget {
         ],
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            // Profile Image
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(member.imageUrl),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              member.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: Colors.white,
-              ),
-            ),
+      body: Obx(() {
+        // Show shimmer loader while profile is loading
+        if (controller.isLoading.value) {
+          return const ProfileInfoShimmer();
+        }
 
-            const SizedBox(height: 19),
+        // Show actual profile content when loaded
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // Profile Image (from API if available)
+              Obx(() {
+                final p = controller.profile.value;
+                final displayImage = p?.profileImage ?? member.imageUrl;
+                return CircleAvatar(
+                  radius: 50,
+          backgroundImage: displayImage.isNotEmpty
+            ? (displayImage.startsWith('http') ? NetworkImage(displayImage) : AssetImage(displayImage) as ImageProvider)
+            : const AssetImage('assets/images/profile.png'),
+                );
+              }),
+              const SizedBox(height: 14),
+              Obx(() {
+                final p = controller.profile.value;
+                final displayName = (p?.name?.isNotEmpty == true) ? p!.name! : member.name;
+                return Text(
+                  displayName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                );
+              }),
 
-            // My Team
+            // const SizedBox(height: 19),
+            // // My Team
             // Align(
             //   alignment: Alignment.centerRight,
             //   child: ElevatedButton(
@@ -89,7 +153,14 @@ class ProfileInfoScreen extends StatelessWidget {
             //         borderRadius: BorderRadius.circular(8),
             //       ),
             //     ),
-            //     onPressed: () {},
+            //     onPressed: () {
+            //       final teamId = controller.profile.value?.clubAffiliation;
+            //       if (teamId != null && teamId.isNotEmpty) {
+            //         Get.to(() => TeamDetailsScreen(teamId: teamId));
+            //       } else {
+            //         Get.snackbar('No team', 'No team associated with this account');
+            //       }
+            //     },
             //     child: const Text(
             //       style: TextStyle(
             //         fontSize: 16,
@@ -100,6 +171,7 @@ class ProfileInfoScreen extends StatelessWidget {
             //     ),
             //   ),
             // ),
+
             // const SizedBox(height: 36),
             // // Matches and Level
             // Row(
@@ -110,6 +182,7 @@ class ProfileInfoScreen extends StatelessWidget {
             //     _buildStatBox("${member.level}", "Level"),
             //   ],
             // ),
+
             const SizedBox(height: 33),
             Card(
               elevation: 4,
@@ -143,10 +216,13 @@ class ProfileInfoScreen extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          Text(
-                            '01712451235',
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                          Obx(() {
+                            final p = controller.profile.value;
+                            return Text(
+                              p?.phoneNumber ?? member.phone,
+                              style: const TextStyle(color: Colors.white),
+                            );
+                          }),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -168,10 +244,13 @@ class ProfileInfoScreen extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          Text(
-                            'niloyshams21@gmail.com',
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                          Obx(() {
+                            final p = controller.profile.value;
+                            return Text(
+                              p?.email ?? member.email,
+                              style: const TextStyle(color: Colors.white),
+                            );
+                          }),
                         ],
                       ),
                     ],
@@ -249,9 +328,16 @@ class ProfileInfoScreen extends StatelessWidget {
                             gender: "Male",
                             imageUrl: member.imageUrl,
                           );
-                          Get.to(
-                            () => ProfileContactUsScreen(member: editProfile),
-                          );
+                          final apiClient = Get.find<ApiClient>();
+                          if (!Get.isRegistered<ContactUsRepo>()) {
+                            Get.put<ContactUsRepo>(ContactUsRepoImpl(apiClient: apiClient));
+                          }
+                          if (!Get.isRegistered<ContactUsController>()) {
+                            Get.put(ContactUsController(Get.find<ContactUsRepo>()));
+                          }
+
+                          Get.to(() => ProfileContactUsScreen(member: editProfile));
+
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -301,7 +387,16 @@ class ProfileInfoScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       InkWell(
                         onTap: () {
+                          final apiClient = Get.find<ApiClient>();
+                          if (!Get.isRegistered<ReportRepo>()) {
+                            Get.put<ReportRepo>(ReportRepoImpl(apiClient: apiClient));
+                          }
+                          if (!Get.isRegistered<ReportController>()) {
+                            Get.put(ReportController(Get.find<ReportRepo>()));
+                          }
+
                           Get.to(() => const ProfileReportScreen());
+
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -347,7 +442,7 @@ class ProfileInfoScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: InkWell(
                       onTap: () {
-                        Get.offAll(() => const LoginScreen());
+                        // Get.offAll(() => const LoginScreen());
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -378,42 +473,9 @@ class ProfileInfoScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      );
+      }),
       bottomNavigationBar: AppBottomNavBar(currentIndex: 3),
-    );
-  }
-
-  // Stat Box
-  Widget _buildStatBox(String value, String label) {
-    return Container(
-      width: 96,
-      height: 51,
-      decoration: BoxDecoration(
-        color: const Color(0xFFD9D9D9),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              color: Color(0xFF2AAF08),
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

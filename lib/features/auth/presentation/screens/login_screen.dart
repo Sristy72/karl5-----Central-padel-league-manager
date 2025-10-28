@@ -3,16 +3,15 @@ import 'package:flutter_karlfive223_manager/core/theme/input_decoration_extensio
 import 'package:flutter_karlfive223_manager/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:flutx_core/flutx_core.dart';
 import 'package:get/get.dart';
+
 import '../../../../core/common/constants/app_images.dart';
 import '../../../../core/common/widgets/app_logo.dart';
 import '../../../../core/common/widgets/app_scaffold.dart';
 import '../../../../core/common/widgets/form_error_message.dart';
-import '../../../../core/common/widgets/or_divider_with_circle.dart';
 import '../../../../core/theme/app_buttoms.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../controller/auth_controller.dart';
 import '../controller/remember_me_controller.dart';
-import '../widgets/different_login_approach.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -269,14 +268,14 @@ class _LoginScreenState extends State<LoginScreen>
 
                         SizedBox(height: 16),
 
-                        OrDividerWithCircle(),
+                        // OrDividerWithCircle(),
 
                         Gap.h16,
 
-                        DifferentLoginApproach(
-                          text: 'Continue With Google',
-                          image: AppImages.googleLogo,
-                        ),
+                        // DifferentLoginApproach(
+                        //   text: 'Continue With Google',
+                        //   image: AppImages.googleLogo,
+                        // ),
                       ],
                     ),
                   ),

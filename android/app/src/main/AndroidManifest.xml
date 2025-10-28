@@ -2,7 +2,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="flutter_karlfive223_manager"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name="com.example.flutter_karlfive223_manager.MainActivity"
             android:exported="true"

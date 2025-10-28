@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_karlfive223_manager/core/common/widgets/shimmer_widgets.dart';
 import 'package:flutter_karlfive223_manager/core/theme/app_colors.dart';
 import 'package:get/get.dart';
-import '../controllers/league_details_controller.dart';
 
 import '../../models/league_model.dart';
+import '../controllers/league_details_controller.dart';
 import '../widgets/custom_league_appbar.dart';
 import '../widgets/fixtures_tab.dart';
 import '../widgets/matches_tab.dart';
@@ -64,8 +65,16 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
         children: [
           Obx(() {
             final ctrl = Get.find<LeagueDetailsController>();
-            if (ctrl.isLoadingStandings.value)
-              return const Center(child: CircularProgressIndicator());
+            if (ctrl.isLoadingStandings.value) {
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: ShimmerBox(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              );
+            }
             if (ctrl.standings.isEmpty) {
               final msg = ctrl.standingsError.value.isNotEmpty
                   ? ctrl.standingsError.value
@@ -79,8 +88,24 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
           // Matches tab now driven by LeagueDetailsController
           Obx(() {
             final ctrl = Get.find<LeagueDetailsController>();
-            if (ctrl.isLoadingMatches.value)
-              return const Center(child: CircularProgressIndicator());
+            if (ctrl.isLoadingMatches.value) {
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: List.generate(
+                    3,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: ShimmerBox(
+                        width: double.infinity,
+                        height: 100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
             if (ctrl.matches.isEmpty) {
               final msg = ctrl.matchesError.value.isNotEmpty
                   ? ctrl.matchesError.value
@@ -95,8 +120,24 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
           // Fixtures tab driven by controller.matches (already filtered by leagueId)
           Obx(() {
             final ctrl = Get.find<LeagueDetailsController>();
-            if (ctrl.isLoadingMatches.value)
-              return const Center(child: CircularProgressIndicator());
+            if (ctrl.isLoadingMatches.value) {
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: List.generate(
+                    3,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: ShimmerBox(
+                        width: double.infinity,
+                        height: 100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
             if (ctrl.matches.isEmpty) {
               final msg = ctrl.matchesError.value.isNotEmpty
                   ? ctrl.matchesError.value

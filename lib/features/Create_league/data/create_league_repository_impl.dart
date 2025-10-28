@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import '../../../core/network/api_client.dart';
 import '../../../core/network/constants/api_constants.dart';
@@ -17,15 +18,32 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
 
   @override
   NetworkResult<CreateLeagueResponseModel> createLeague(
-    CreateLeagueRequestModel request, {
-    File? logoFile,
-    File? bannerFile,
-  }) async {
+      CreateLeagueRequestModel request, {
+        File? logoFile,
+        File? bannerFile,
+      }) async {
     try {
-      // Build FormData
       final formData = FormData();
 
-      // Add logo file if provided
+      // Text fields (match Postman one-to-one)
+      formData.fields.addAll([
+        MapEntry('user', request.user),
+        MapEntry('leagueName', request.leagueName),
+        MapEntry('description', request.description),
+        MapEntry('startDate', request.startDate),
+        MapEntry('endDate', request.endDate ?? ''),
+        MapEntry('location', request.location),
+        MapEntry('addTeam', ''),
+        MapEntry('type', request.type),
+        MapEntry('matchFormat', request.matchFormat),
+        MapEntry('tiebreakOption', request.tiebreakOption),
+        MapEntry('allowSubstitutes', request.allowSubstitutes.toString()),
+        MapEntry('totalGameWeeks', request.totalGameWeeks.toString()),
+        MapEntry('price', request.price ?? ''),
+
+      ]);
+
+      // Logo (file)
       if (logoFile != null) {
         final filename = path.basename(logoFile.path);
         formData.files.add(
@@ -36,7 +54,7 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
         );
       }
 
-      // Add banner file if provided
+      // Banner (optional file)
       if (bannerFile != null) {
         final filename = path.basename(bannerFile.path);
         formData.files.add(
@@ -47,19 +65,21 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
         );
       }
 
-      // Add JSON data as a text field
-      formData.fields.add(MapEntry('data', jsonEncode(request.toJson())));
-
-      return _apiClient.post<CreateLeagueResponseModel>(
+      // Send as multipart/form-data
+      return _apiClient.postFormData<CreateLeagueResponseModel>(
         '${ApiConstants.baseUrl}/league/create',
-        data: formData,
+        formData: formData,
         fromJsonT: (json) =>
             CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
       );
-    } catch (e) {
+
+    } catch (e, st) {
+      if (kDebugMode) print("createLeague error: $e\n$st");
       rethrow;
     }
   }
+
+
 
   @override
   NetworkResult<CreateLeagueResponseModel> getLeagueById(String id) {

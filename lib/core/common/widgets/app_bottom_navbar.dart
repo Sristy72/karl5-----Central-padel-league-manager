@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/network/api_client.dart';
 import '../../../features/home/presentation/screens/home_screen.dart';
 import '../../../features/league/presentation/screens/leagues_screen.dart';
 import '../../../features/notification/presentation/screen/notification_dummy_screen.dart';
-import '../../../features/team_members_profile/models/team_member_model.dart';
+import '../../../features/team_details/data/repo/team_repo_impl.dart';
+import '../../../features/team_details/presentation/controllers/team_controller.dart';
+import '../../../features/team_members_profile/data/models/team_member_model.dart';
+import '../../../features/team_members_profile/data/repo/contact_us_repo_impl.dart';
+import '../../../features/team_members_profile/data/repo/user_profile_repo_impl.dart';
+import '../../../features/team_members_profile/presentation/controllers/contact_us_controller.dart';
+import '../../../features/team_members_profile/presentation/controllers/profile_controller.dart';
 import '../../../features/team_members_profile/presentation/screens/profile_info_screen.dart';
 
 // Create a GetX controller for navigation
@@ -25,8 +32,15 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize the controller if not already initialized
-    final controller = Get.put(BottomNavController());
-    controller.currentIndex.value = currentIndex;
+    final BottomNavController controller = Get.put(BottomNavController());
+    // Avoid mutating observable state synchronously during build
+    // (which causes "setState() or markNeedsBuild() called during build" errors).
+    // Schedule the update to happen after the current frame when needed.
+    if (controller.currentIndex.value != currentIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.currentIndex.value = currentIndex;
+      });
+    }
 
     Widget _buildNavItem({
       required int index,
@@ -103,12 +117,65 @@ class AppBottomNavBar extends StatelessWidget {
                 duration: const Duration(milliseconds: 50),
               );
             } else if (index == 3) {
+              // Create a default team member model for the profile
+              final defaultMember = TeamMemberModel(
+                id: '1',
+                name: 'User Profile',
+                role: 'Player',
+                imageUrl: 'assets/images/profile.png',
+                matches: 0,
+                level: 1,
+                firstName: 'User',
+                lastName: 'Profile',
+                email: '',
+                phone: '',
+                birthday: '',
+                gender: '',
+              );
+
+              // Safe initialize dependencies without touching core
+              ApiClient apiClient;
+              if (Get.isRegistered<ApiClient>()) {
+                apiClient = Get.find<ApiClient>();
+              } else {
+                apiClient = Get.put(ApiClient());
+              }
+
+              // Ensure UserProfileRepo + ProfileController
+              if (!Get.isRegistered<UserProfileRepoImpl>()) {
+                Get.put(UserProfileRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<ProfileController>()) {
+                Get.put(
+                  ProfileController(repository: Get.find<UserProfileRepoImpl>()),
+                  permanent: true,
+                );
+              }
+
+              // Ensure TeamRepo + TeamController
+              if (!Get.isRegistered<TeamRepoImpl>()) {
+                Get.put(TeamRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<TeamController>()) {
+                Get.put(TeamController(repo: Get.find<TeamRepoImpl>()));
+              }
+
+              // Ensure ContactUsRepo + ContactUsController
+              if (!Get.isRegistered<ContactUsRepoImpl>()) {
+                Get.put(ContactUsRepoImpl(apiClient: apiClient));
+              }
+              if (!Get.isRegistered<ContactUsController>()) {
+                Get.put(ContactUsController(Get.find<ContactUsRepoImpl>()));
+              }
+
+              // Finally navigate
               Get.offAll(
-                () => ProfileInfoScreen(member: dummyMember),
+                    () => ProfileInfoScreen(member: defaultMember),
                 transition: Transition.fadeIn,
                 duration: const Duration(milliseconds: 50),
               );
             }
+
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
