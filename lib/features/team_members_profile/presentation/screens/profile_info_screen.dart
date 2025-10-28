@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_karlfive223_manager/features/team_members_profile/presentation/screens/profile_contactus_screen.dart';
 import 'package:flutter_karlfive223_manager/features/team_members_profile/presentation/screens/profile_report_screen.dart';
 import 'package:get/get.dart';
+
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../EntireScreen/data/repo/user_info_repo_impl.dart';
 import '../../../EntireScreen/domain/repo/user_info_repo.dart';
 import '../../../auth/presentation/controller/auth_controller.dart';
 import '../../../privacy_policy/presentation/screens/privacy_pilicy_screen.dart';
+import '../../../team_details/domain/repo/team_repo.dart';
 import '../../../team_details/presentation/controllers/team_controller.dart';
-import '../../../team_details/presentation/screens/team_details_screens.dart';
 import '../../data/models/edit_profile_model.dart';
 import '../../data/models/team_member_model.dart';
 import '../../data/repo/contact_us_repo_impl.dart';
@@ -33,7 +34,16 @@ class ProfileInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileController>();
-    final teamCtrl = Get.find<TeamController>();
+    // Ensure a TeamController exists — when navigating back from edit screen
+    // the app bottom nav initializers may not have run, so create it lazily here.
+    late final TeamController teamCtrl;
+    if (Get.isRegistered<TeamController>()) {
+      teamCtrl = Get.find<TeamController>();
+    } else {
+      // TeamRepo should be registered by setupRepository; use that repo instance
+      // to construct the TeamController lazily for this screen only.
+      teamCtrl = Get.put(TeamController(repo: Get.find<TeamRepo>()));
+    }
 
     // If profile has a linked team id, fetch team data so TeamDetailsScreen is ready.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -124,46 +134,46 @@ class ProfileInfoScreen extends StatelessWidget {
               );
             }),
 
-            const SizedBox(height: 19),
-            // My Team
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFD9D9D9),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onPressed: () {
-                  final teamId = controller.profile.value?.clubAffiliation;
-                  if (teamId != null && teamId.isNotEmpty) {
-                    Get.to(() => TeamDetailsScreen(teamId: teamId));
-                  } else {
-                    Get.snackbar('No team', 'No team associated with this account');
-                  }
-                },
-                child: const Text(
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF060606),
-                  ),
-                  "My team",
-                ),
-              ),
-            ),
+            // const SizedBox(height: 19),
+            // // My Team
+            // Align(
+            //   alignment: Alignment.centerRight,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Color(0xFFD9D9D9),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(8),
+            //       ),
+            //     ),
+            //     onPressed: () {
+            //       final teamId = controller.profile.value?.clubAffiliation;
+            //       if (teamId != null && teamId.isNotEmpty) {
+            //         Get.to(() => TeamDetailsScreen(teamId: teamId));
+            //       } else {
+            //         Get.snackbar('No team', 'No team associated with this account');
+            //       }
+            //     },
+            //     child: const Text(
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.w400,
+            //         color: Color(0xFF060606),
+            //       ),
+            //       "My team",
+            //     ),
+            //   ),
+            // ),
 
-            const SizedBox(height: 36),
-            // Matches and Level
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildStatBox("${member.matches}", "Matches"),
-                const SizedBox(width: 21),
-                _buildStatBox("${member.level}", "Level"),
-              ],
-            ),
+            // const SizedBox(height: 36),
+            // // Matches and Level
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     _buildStatBox("${member.matches}", "Matches"),
+            //     const SizedBox(width: 21),
+            //     _buildStatBox("${member.level}", "Level"),
+            //   ],
+            // ),
 
             const SizedBox(height: 33),
             Card(

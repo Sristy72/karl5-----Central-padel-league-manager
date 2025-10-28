@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:get/get.dart' hide FormData, MultipartFile;
-import '../../../../core/network/services/multiple_form_data_manager.dart';
+import 'package:dio/dio.dart';
 import '../../domain/repo/report_repo.dart';
 
 class ReportController extends GetxController {
   final ReportRepo _reportRepo;
   ReportController(this._reportRepo);
 
-  final MultiFormDataManager multiFormDataManager = MultiFormDataManager();
   final isLoading = false.obs;
 
   Future<void> createReport({
@@ -19,15 +18,23 @@ class ReportController extends GetxController {
     try {
       isLoading.value = true;
 
-      multiFormDataManager.addTextData("user", userId);
-      multiFormDataManager.addTextData("even", even);
-      multiFormDataManager.addTextData("description", description);
+      // Build FormData manually to ensure the file field name matches the backend
+      final formData = FormData();
+      formData.fields.add(MapEntry('user', userId));
+      formData.fields.add(MapEntry('even', even));
+      formData.fields.add(MapEntry('description', description));
 
       if (imageFile != null) {
-        multiFormDataManager.addImageFile(imageFile);
+        final fileName = imageFile.path.split('/').last;
+        formData.files.add(MapEntry(
+          'file', // backend expects 'file' key in form-data (see Postman example)
+          await MultipartFile.fromFile(
+            imageFile.path,
+            filename: fileName,
+          ),
+        ));
       }
 
-      final formData = multiFormDataManager.toFormData();
       final result = await _reportRepo.report(formData);
 
       result.fold(

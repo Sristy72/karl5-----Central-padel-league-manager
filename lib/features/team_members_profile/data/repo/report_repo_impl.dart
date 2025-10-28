@@ -14,6 +14,7 @@ class ReportRepoImpl implements ReportRepo {
     return _apiClient.post<ReportData>(
       ApiConstants.report.createReport,
       formData: formData,
+      isFormData: true,
       fromJsonT: (json) => ReportData.fromJson(json),
     );
   }
