@@ -4,6 +4,7 @@ import 'package:flutter_karlfive223_manager/features/team_members_profile/presen
 import 'package:get/get.dart';
 
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
+import '../../../../core/common/widgets/shimmer_widgets.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../EntireScreen/data/repo/user_info_repo_impl.dart';
 import '../../../EntireScreen/domain/repo/user_info_repo.dart';
@@ -105,34 +106,41 @@ class ProfileInfoScreen extends StatelessWidget {
         ],
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            // Profile Image (from API if available)
-            Obx(() {
-              final p = controller.profile.value;
-              final displayImage = p?.profileImage ?? member.imageUrl;
-              return CircleAvatar(
-                radius: 50,
-        backgroundImage: displayImage.isNotEmpty
-          ? (displayImage.startsWith('http') ? NetworkImage(displayImage) : AssetImage(displayImage) as ImageProvider)
-          : const AssetImage('assets/images/profile.png'),
-              );
-            }),
-            const SizedBox(height: 14),
-            Obx(() {
-              final p = controller.profile.value;
-              final displayName = (p?.name?.isNotEmpty == true) ? p!.name! : member.name;
-              return Text(
-                displayName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                ),
-              );
-            }),
+      body: Obx(() {
+        // Show shimmer loader while profile is loading
+        if (controller.isLoading.value) {
+          return const ProfileInfoShimmer();
+        }
+
+        // Show actual profile content when loaded
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // Profile Image (from API if available)
+              Obx(() {
+                final p = controller.profile.value;
+                final displayImage = p?.profileImage ?? member.imageUrl;
+                return CircleAvatar(
+                  radius: 50,
+          backgroundImage: displayImage.isNotEmpty
+            ? (displayImage.startsWith('http') ? NetworkImage(displayImage) : AssetImage(displayImage) as ImageProvider)
+            : const AssetImage('assets/images/profile.png'),
+                );
+              }),
+              const SizedBox(height: 14),
+              Obx(() {
+                final p = controller.profile.value;
+                final displayName = (p?.name?.isNotEmpty == true) ? p!.name! : member.name;
+                return Text(
+                  displayName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                );
+              }),
 
             // const SizedBox(height: 19),
             // // My Team
@@ -465,42 +473,9 @@ class ProfileInfoScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      );
+      }),
       bottomNavigationBar: AppBottomNavBar(currentIndex: 3),
-    );
-  }
-
-  // Stat Box
-  Widget _buildStatBox(String value, String label) {
-    return Container(
-      width: 96,
-      height: 51,
-      decoration: BoxDecoration(
-        color: const Color(0xFFD9D9D9),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              color: Color(0xFF2AAF08),
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

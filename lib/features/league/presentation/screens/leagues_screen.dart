@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
+import '../../../../core/common/widgets/shimmer_widgets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../presentation/controllers/league_controller.dart';
 import '../widgets/league_card.dart';
@@ -21,7 +23,7 @@ class _LeaguesScreenState extends State<LeaguesScreen> {
       backgroundColor: AppColors.leagueBackgroundGrey,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const LeagueListShimmer();
         } else if (controller.errorMessage.isNotEmpty) {
           return Center(child: Text('Error: ${controller.errorMessage}'));
         } else if (controller.leagues.isEmpty) {

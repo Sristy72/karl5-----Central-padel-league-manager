@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/common/widgets/shimmer_widgets.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../league/data/league_repository_impl.dart';
 import '../../../league/models/match_model.dart';
 import '../../data/models/standing_row_data.dart';
+import '../controllers/team_controller.dart';
 import '../widgets/standing_table_widget.dart';
 import '../widgets/team_fixtures_widget.dart';
-import '../controllers/team_controller.dart';
 
 class TeamDetailsScreen extends StatefulWidget {
   final String? teamId;
@@ -145,9 +146,7 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
         child: Obx(() {
           final teamController = Get.find<TeamController>();
           if (teamController.isLoading.value) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.green),
-            );
+            return const TeamDetailsShimmer();
           }
 
           if (teamController.error.value != null) {
@@ -254,8 +253,13 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                 const SizedBox(height: 12),
                 Obx(() {
                   if (_isLoadingStandings.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: Colors.green),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: ShimmerBox(
+                        width: double.infinity,
+                        height: 200,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     );
                   }
                   if (_standingsError.value.isNotEmpty) {
