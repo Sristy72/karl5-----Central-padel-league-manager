@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
 import '../../../../core/network/services/multiple_form_data_manager.dart';
 import '../../../EntireScreen/domain/repo/user_info_repo.dart';
@@ -37,11 +38,19 @@ class EditProfileController extends GetxController {
       }
       manager.addTextData('gender', gender);
 
-      if (image != null) {
-        manager.addImageFile(image);
-      }
-
+      // Do not add the image to the manager (it would use the 'images' field name).
+      // Instead, validate text fields first then attach the single profile image under 'image'.
       final formData = await manager.toFormDataWithValidation();
+
+      if (image != null) {
+        formData.files.add(MapEntry(
+          'image',
+          await dio.MultipartFile.fromFile(
+            image.path,
+            filename: image.path.split('/').last,
+          ),
+        ));
+      }
 
       final result = await _repo.updateprofile(formData);
 
@@ -83,9 +92,9 @@ class EditProfileController extends GetxController {
       final daysInMonth = <int>[0, 31, _isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
       if (day < 1 || day > daysInMonth[month]) return null;
 
-  final mm = month.toString().padLeft(2, '0');
-  final dd = day.toString().padLeft(2, '0');
-  return '${year.toString().padLeft(4, '0')}-$mm-$dd';
+      final mm = month.toString().padLeft(2, '0');
+      final dd = day.toString().padLeft(2, '0');
+      return '${year.toString().padLeft(4, '0')}-$mm-$dd';
     } catch (_) {
       return null;
     }

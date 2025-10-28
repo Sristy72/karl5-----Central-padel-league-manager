@@ -30,12 +30,12 @@ class EditProfileModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'phone': phone,
-        'birthday': birthday,
-        'gender': gender,
-        'profileImage': imageUrl,
-      };
+    'firstName': firstName,
+    'lastName': lastName,
+    'email': email,
+    'phone': phone,
+    'birthday': birthday,
+    'gender': gender,
+    'profileImage': imageUrl,
+  };
 }
