@@ -1,6 +1,8 @@
 import 'dart:io';
-import 'package:get/get.dart' hide FormData, MultipartFile;
+
 import 'package:dio/dio.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
+
 import '../../domain/repo/report_repo.dart';
 
 class ReportController extends GetxController {
