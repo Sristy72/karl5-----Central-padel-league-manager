@@ -25,7 +25,7 @@ class EditProfileModel {
       phone: json['phoneNumber'] ?? json['phone'] ?? '',
       birthday: json['birthday'] ?? '',
       gender: json['gender'] ?? '',
-      imageUrl: json['profileImage'] ?? json['imageUrl'] ?? 'assets/images/profile.png',
+      imageUrl: json['image'] ?? json['imageUrl'] ?? 'assets/images/profile.png',
     );
   }
 
@@ -36,6 +36,6 @@ class EditProfileModel {
     'phone': phone,
     'birthday': birthday,
     'gender': gender,
-    'profileImage': imageUrl,
+    'image': imageUrl,
   };
 }
