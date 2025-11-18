@@ -4,10 +4,14 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
   final String selectedType;
   final String selectedMatchFormat;
   final String selectedTiebreak;
+  final String selectedMatchPlay;
+  final String selectedLeagueType;
   final bool allowSubstitutes;
   final Function(String) onTypeChanged;
   final Function(String) onMatchFormatChanged;
   final Function(String) onTiebreakChanged;
+  final Function(String) onMatchPlayChanged;
+  final Function(String) onLeagueTypeChanged;
   final Function(bool) onAllowSubstitutesChanged;
 
   const CreateLeagueSelectionButtons({
@@ -15,10 +19,14 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
     required this.selectedType,
     required this.selectedMatchFormat,
     required this.selectedTiebreak,
+    required this.selectedMatchPlay,
+    required this.selectedLeagueType,
     required this.allowSubstitutes,
     required this.onTypeChanged,
     required this.onMatchFormatChanged,
     required this.onTiebreakChanged,
+    required this.onMatchPlayChanged,
+    required this.onLeagueTypeChanged,
     required this.onAllowSubstitutesChanged,
   });
 
@@ -123,6 +131,58 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
               ),
             ],
           ),
+        ),
+        const SizedBox(height: 24),
+
+        // Match Play with others team
+        const Text(
+          "Match Play with others team",
+          style: TextStyle(color: Colors.white, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildSelectionButton(
+              'Once',
+              selectedMatchPlay == 'Once',
+                  () => onMatchPlayChanged('Once'),
+            ),
+            const SizedBox(width: 7),
+            _buildSelectionButton(
+              'Twice',
+              selectedMatchPlay == 'Twice',
+                  () => onMatchPlayChanged('Twice'),
+            ),
+            const SizedBox(width: 7),
+            _buildSelectionButton(
+              'Thrice',
+              selectedMatchPlay == 'Thrice',
+                  () => onMatchPlayChanged('Thrice'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // League Type
+        const Text(
+          "League Type",
+          style: TextStyle(color: Colors.white, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildSelectionButton(
+              'Public',
+              selectedLeagueType == 'Public',
+                  () => onLeagueTypeChanged('Public'),
+            ),
+            const SizedBox(width: 7),
+            _buildSelectionButton(
+              'Private',
+              selectedLeagueType == 'Private',
+                  () => onLeagueTypeChanged('Private'),
+            ),
+          ],
         ),
       ],
     );
