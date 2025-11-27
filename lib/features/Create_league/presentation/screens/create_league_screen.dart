@@ -1,23 +1,22 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_karlfive223_manager/features/notification/presentation/screen/notification_dummy_screen.dart'
-    show NotificationScreen;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../controllers/create_league_controller.dart' as api_ctrl;
+import '../../../home/presentation/screens/home_screen.dart';
 import '../../data/create_league_repository.dart';
-import '../../data/models/create_league_model.dart' as form_model;
 import '../../data/models/create_league_request_model.dart';
-
+import '../controllers/create_league_controller.dart' as api_ctrl;
 import '../widgets/create_league_app_bar.dart';
+import '../widgets/create_league_date_location_fields.dart';
 import '../widgets/create_league_form_fields.dart';
 import '../widgets/create_league_image_upload.dart';
-import '../widgets/create_league_date_location_fields.dart';
-import '../widgets/create_league_selection_buttons.dart';
 import '../widgets/create_league_rules_section.dart';
+import '../widgets/create_league_selection_buttons.dart';
 import '../widgets/create_league_validation.dart';
+import '../widgets/private_league_code_dialog.dart';
 
 class CreateLeagueScreen extends StatefulWidget {
   const CreateLeagueScreen({super.key});
@@ -50,6 +49,8 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   String _selectedType = 'Singles';
   String _selectedMatchFormat = 'Best of 3 sets';
   String _selectedTiebreak = 'Standard 7-point';
+  String _selectedMatchPlay = 'Once';
+  String _selectedLeagueType = 'Public';
   bool _allowSubstitutes = false;
 
   Future<void> _pickImage(bool isLogo) async {
@@ -159,6 +160,8 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
               selectedMatchFormat: _selectedMatchFormat,
               selectedTiebreak: _selectedTiebreak,
               allowSubstitutes: _allowSubstitutes,
+              selectedMatchPlay: _selectedMatchPlay,
+              selectedLeagueType: _selectedLeagueType,
               onTypeChanged: (type) => setState(() => _selectedType = type),
               onMatchFormatChanged: (format) =>
                   setState(() => _selectedMatchFormat = format),
@@ -166,6 +169,10 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   setState(() => _selectedTiebreak = tiebreak),
               onAllowSubstitutesChanged: (allow) =>
                   setState(() => _allowSubstitutes = allow),
+              onMatchPlayChanged: (matchPlay) =>
+                  setState(() => _selectedMatchPlay = matchPlay),
+              onLeagueTypeChanged: (leagueType) =>
+                  setState(() => _selectedLeagueType = leagueType),
             ),
 
             const SizedBox(height: 16),
@@ -324,6 +331,8 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       matchFormat: _selectedMatchFormat,
       tiebreakOption: _selectedTiebreak,
       allowSubstitutes: _allowSubstitutes,
+      matchPlay: _selectedMatchPlay,
+      leagueType: _selectedLeagueType,
       price: _entryFeeController.text.trim(),
     );
 
@@ -334,15 +343,31 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     );
 
     if (success) {
-      Get.snackbar(
-        'Success',
-        'League created successfully!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      // Save league type BEFORE resetting form
+      final isPrivateLeague = _selectedLeagueType == 'Private';
+      print('💾 League Type before reset: $_selectedLeagueType');
+      
       _resetForm();
-      Get.back();
+      
+      // Show private league code dialog if league type is private
+      if (isPrivateLeague) {
+        // MUST show popup for private leagues
+        print('🔒 Private League Created - Showing Code Dialog');
+        _showPrivateLeagueCodeDialog();
+      } else {
+        // For public leagues, show success snackbar and navigate to home
+        print('🌍 Public League Created - Navigating to Home');
+        Get.snackbar(
+          'Success',
+          'League published successfully!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        // Navigate to home screen and clear navigation stack
+        Get.offAll(() => const HomeScreen());
+      }
     } else {
       Get.snackbar(
         'Error',
@@ -368,7 +393,31 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       _selectedType = 'Singles';
       _selectedMatchFormat = 'Best of 3 sets';
       _selectedTiebreak = 'Standard 7-point';
+      _selectedMatchPlay = 'Once';
+      _selectedLeagueType = 'Public';
       _allowSubstitutes = false;
     });
+  }
+
+  /// Generate a random 5-digit number for private leagues
+  String _generateRandomCode() {
+    // Generate random 5-digit number (10000 to 99999)
+    final random = DateTime.now().microsecondsSinceEpoch % 90000 + 10000;
+    return random.toString();
+  }
+
+  /// Show dialog with private league code
+  void _showPrivateLeagueCodeDialog() {
+    final leagueCode = _generateRandomCode();
+    print('🎲 Generated 5-digit code: $leagueCode');
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        print('📱 Building Private League Dialog...');
+        return PrivateLeagueCodeDialog(leagueCode: leagueCode);
+      },
+    );
   }
 }
