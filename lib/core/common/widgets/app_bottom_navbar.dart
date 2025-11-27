@@ -117,16 +117,19 @@ class AppBottomNavBar extends StatelessWidget {
                 duration: const Duration(milliseconds: 50),
               );
             } else if (index == 3) {
-              // Create a default team member model for the profile
+              // Create a default (neutral) team member model for the profile.
+              // Avoid injecting static placeholders like 'User'/'Profile' which
+              // can be saved back to the server when the user edits only one
+              // name field. Use empty strings for name parts instead.
               final defaultMember = TeamMemberModel(
                 id: '1',
-                name: 'User Profile',
+                name: '',
                 role: 'Player',
                 imageUrl: 'assets/images/profile.png',
                 matches: 0,
                 level: 1,
-                firstName: 'User',
-                lastName: 'Profile',
+                firstName: '',
+                lastName: '',
                 email: '',
                 phone: '',
                 birthday: '',

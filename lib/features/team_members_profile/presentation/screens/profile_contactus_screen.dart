@@ -254,9 +254,9 @@ class ProfileContactUsScreen extends StatelessWidget {
     final subject = subjectController.text.trim();
     final yourCompany = yourCompanyController.text.trim();
 
-    // Basic validation
-    if (firstName.isEmpty || lastName.isEmpty) {
-      controller.setError("First name and last name are required");
+    // Basic validation: require at least one of first or last name (not both)
+    if (firstName.isEmpty && lastName.isEmpty) {
+      controller.setError("Please provide at least a first name or a last name");
       return;
     }
 
