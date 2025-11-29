@@ -46,11 +46,12 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   File? _bannerImage;
 
   // Selection state for Type, Match Format, and Tiebreak
-  String _selectedType = 'Singles';
-  String _selectedMatchFormat = 'Best of 3 sets';
-  String _selectedTiebreak = 'Standard 7-point';
-  String _selectedMatchPlay = 'Once';
-  String _selectedLeagueType = 'Public';
+  String _selectedType = '';
+  String _selectedMatchFormat = '';
+  String _selectedTiebreak = '';
+  String _selectedMatchPlay = '';
+  String _selectedLeagueType = '';
+  String _selectedPlayerLevel = '';
   bool _allowSubstitutes = false;
 
   Future<void> _pickImage(bool isLogo) async {
@@ -162,6 +163,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
               allowSubstitutes: _allowSubstitutes,
               selectedMatchPlay: _selectedMatchPlay,
               selectedLeagueType: _selectedLeagueType,
+              selectedPlayerLevel: _selectedPlayerLevel,
               onTypeChanged: (type) => setState(() => _selectedType = type),
               onMatchFormatChanged: (format) =>
                   setState(() => _selectedMatchFormat = format),
@@ -173,6 +175,8 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
                   setState(() => _selectedMatchPlay = matchPlay),
               onLeagueTypeChanged: (leagueType) =>
                   setState(() => _selectedLeagueType = leagueType),
+              onPlayerLevelChanged: (level) =>
+                  setState(() => _selectedPlayerLevel = level),
             ),
 
             const SizedBox(height: 16),
@@ -390,11 +394,12 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     setState(() {
       _logoImage = null;
       _bannerImage = null;
-      _selectedType = 'Singles';
-      _selectedMatchFormat = 'Best of 3 sets';
-      _selectedTiebreak = 'Standard 7-point';
-      _selectedMatchPlay = 'Once';
-      _selectedLeagueType = 'Public';
+      _selectedType = '';
+      _selectedMatchFormat = '';
+      _selectedTiebreak = '';
+      _selectedMatchPlay = '';
+      _selectedLeagueType = '';
+      _selectedPlayerLevel = '';
       _allowSubstitutes = false;
     });
   }
