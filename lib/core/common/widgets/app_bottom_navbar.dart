@@ -5,7 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/network/api_client.dart';
 import '../../../features/home/presentation/screens/home_screen.dart';
 import '../../../features/league/presentation/screens/leagues_screen.dart';
-import '../../../features/notification/presentation/screen/notification_dummy_screen.dart';
+import '../../../features/notification/presentation/screen/notification_screen.dart';
 import '../../../features/team_details/data/repo/team_repo_impl.dart';
 import '../../../features/team_details/presentation/controllers/team_controller.dart';
 import '../../../features/team_members_profile/data/models/team_member_model.dart';
@@ -211,9 +211,9 @@ class AppBottomNavBar extends StatelessWidget {
             BottomNavigationBarItem(
               icon: _buildNavItem(
                 index: 2,
-                icon: "assets/icons/Vector.png",
-                activeIcon: "assets/icons/Vector.png",
-                label: "League",
+                icon: "assets/icons/notifi.png",
+                activeIcon: "assets/icons/notifi.png",
+                label: "Notification",
               ),
               label: '',
             ),

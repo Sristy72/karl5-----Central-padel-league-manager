@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_karlfive223_manager/features/notification/presentation/screen/notification_dummy_screen.dart'
+import 'package:flutter_karlfive223_manager/features/notification/presentation/screen/notification_screen.dart'
     show NotificationScreen;
 
 import '../../../../core/theme/app_colors.dart';
