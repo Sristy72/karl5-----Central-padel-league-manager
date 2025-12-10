@@ -11,6 +11,8 @@ class CreateLeagueRequestModel {
   final String matchFormat;
   final String tiebreakOption;
   final bool allowSubstitutes;
+  final String matchPlay;
+  final String leagueType;
 
   CreateLeagueRequestModel({
     required this.user,
@@ -25,6 +27,8 @@ class CreateLeagueRequestModel {
     required this.tiebreakOption,
     required this.allowSubstitutes,
     required this.price,
+    required this.matchPlay,
+    required this.leagueType,
   });
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +41,8 @@ class CreateLeagueRequestModel {
     'matchFormat': matchFormat,
     'tiebreakOption': tiebreakOption,
     'allowSubstitutes': allowSubstitutes,
+    'matchPlay': matchPlay,
+    'leagueType': leagueType,
     if (price != null && price!.isNotEmpty) 'price': price,
   };
 }

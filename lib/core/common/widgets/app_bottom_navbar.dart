@@ -5,7 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/network/api_client.dart';
 import '../../../features/home/presentation/screens/home_screen.dart';
 import '../../../features/league/presentation/screens/leagues_screen.dart';
-import '../../../features/notification/presentation/screen/notification_dummy_screen.dart';
+import '../../../features/notification/presentation/screen/notification_screen.dart';
 import '../../../features/team_details/data/repo/team_repo_impl.dart';
 import '../../../features/team_details/presentation/controllers/team_controller.dart';
 import '../../../features/team_members_profile/data/models/team_member_model.dart';
@@ -117,16 +117,19 @@ class AppBottomNavBar extends StatelessWidget {
                 duration: const Duration(milliseconds: 50),
               );
             } else if (index == 3) {
-              // Create a default team member model for the profile
+              // Create a default (neutral) team member model for the profile.
+              // Avoid injecting static placeholders like 'User'/'Profile' which
+              // can be saved back to the server when the user edits only one
+              // name field. Use empty strings for name parts instead.
               final defaultMember = TeamMemberModel(
                 id: '1',
-                name: 'User Profile',
+                name: '',
                 role: 'Player',
                 imageUrl: 'assets/images/profile.png',
                 matches: 0,
                 level: 1,
-                firstName: 'User',
-                lastName: 'Profile',
+                firstName: '',
+                lastName: '',
                 email: '',
                 phone: '',
                 birthday: '',
@@ -208,9 +211,9 @@ class AppBottomNavBar extends StatelessWidget {
             BottomNavigationBarItem(
               icon: _buildNavItem(
                 index: 2,
-                icon: "assets/icons/Vector.png",
-                activeIcon: "assets/icons/Vector.png",
-                label: "League",
+                icon: "assets/icons/notifi.png",
+                activeIcon: "assets/icons/notifi.png",
+                label: "Notification",
               ),
               label: '',
             ),

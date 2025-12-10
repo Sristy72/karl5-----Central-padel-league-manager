@@ -35,4 +35,18 @@ class NotificationRepoImpl implements NotificationRepo {
       // isFormData: true
     );
   }
+
+  @override
+  NetworkResult<List<NotificationResponseModel>> getNotificationsByUserId(String userId) {
+    return _apiClient.get<List<NotificationResponseModel>>(
+      ApiConstants.notification.getNotificationsByUserId(userId),
+      fromJsonT: (json) {
+        // json is already the 'data' array from the BaseResponse
+        final dataList = json as List<dynamic>? ?? [];
+        return dataList
+            .map((item) => NotificationResponseModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      },
+    );
+  }
 }

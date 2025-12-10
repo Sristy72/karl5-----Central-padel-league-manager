@@ -382,30 +382,36 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                       final rawBirthday = _birthdayController.text.trim();
                       final rawGender = _selectedGender;
 
-                      // Use existing member/profile values as fallback when fields left empty
+                      // Use provided values when available. If a field is left empty,
+                      // prefer any existing server profile values; if none exist then
+                      // keep it empty. We do NOT inject static placeholder defaults.
                       final profileVal = _profileController.profile.value;
+
                       final firstName = rawFirst.isNotEmpty
                           ? rawFirst
-                          : (widget.member.firstName.isNotEmpty
-                          ? widget.member.firstName
-                          : (profileVal?.name?.split(' ').first ?? ''));
+                          : (profileVal?.name?.split(' ').first ?? (widget.member.firstName.isNotEmpty ? widget.member.firstName : ''));
+
                       final lastName = rawLast.isNotEmpty
                           ? rawLast
-                          : (widget.member.lastName.isNotEmpty
-                          ? widget.member.lastName
-                          : (profileVal?.name?.split(' ').length ?? 0) > 1
-                          ? profileVal!.name!.split(' ').sublist(1).join(' ')
-                          : '');
+                          : ((profileVal?.name != null && (profileVal!.name!.split(' ').length > 1))
+                              ? profileVal.name!.split(' ').sublist(1).join(' ')
+                              : (widget.member.lastName.isNotEmpty ? widget.member.lastName : ''));
 
-                      final phone = rawPhone.isNotEmpty ? rawPhone : (widget.member.phone.isNotEmpty ? widget.member.phone : (profileVal?.phoneNumber ?? ''));
-                      final birthday = rawBirthday.isNotEmpty ? rawBirthday : (widget.member.birthday.isNotEmpty ? widget.member.birthday : '');
-                      final gender = rawGender.isNotEmpty ? rawGender : (widget.member.gender.isNotEmpty ? widget.member.gender : (profileVal?.gender ?? ''));
+                      final phone = rawPhone.isNotEmpty
+                          ? rawPhone
+                          : (profileVal?.phoneNumber ?? (widget.member.phone.isNotEmpty ? widget.member.phone : ''));
+                      final birthday = rawBirthday.isNotEmpty
+                          ? rawBirthday
+                          : (widget.member.birthday.isNotEmpty ? widget.member.birthday : '');
+                      final gender = rawGender.isNotEmpty
+                          ? rawGender
+                          : (profileVal?.gender ?? (widget.member.gender.isNotEmpty ? widget.member.gender : ''));
 
-                      // Basic validation
-                      if (firstName.isEmpty || lastName.isEmpty) {
+                      // Validation: require at least one of first or last name.
+                      if (firstName.isEmpty && lastName.isEmpty) {
                         Get.snackbar(
                           'Validation Error',
-                          'First name and last name are required',
+                          'Please provide at least a first name or a last name',
                           snackPosition: SnackPosition.BOTTOM,
                           backgroundColor: Colors.red,
                           colorText: Colors.white,
@@ -438,7 +444,7 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                         final updated = profileCtrl.profile.value;
                         final memberModel = TeamMemberModel(
                           id: updated?.id ?? '',
-                          name: updated?.name ?? '${firstName} ${lastName}',
+                          name: updated?.name ?? [firstName, lastName].where((s) => s.isNotEmpty).join(' '),
                           role: updated?.role ?? '',
                           imageUrl: updated?.profileImage ?? widget.member.imageUrl,
                           matches: 0,

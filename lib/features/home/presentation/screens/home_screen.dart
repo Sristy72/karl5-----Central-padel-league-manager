@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_karlfive223_manager/features/Create_league/presentation/screens/create_league_screen.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/common/constants/app_images.dart';
 import '../../../../core/common/widgets/app_bottom_navbar.dart';
 import '../../../../core/common/widgets/shimmer_widgets.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -20,34 +21,80 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
-    final controller = Get.put(HomeController()); //! Do not comment this line
+    final controller = Get.put(HomeController());
 
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
           automaticallyImplyLeading: false,
+          centerTitle: false,
           backgroundColor: AppColors.leagueBackgroundGrey,
           elevation: 0,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Obx(() {
-                final controller = Get.find<HomeController>();
-                final name = controller.userName.value.isNotEmpty
-                    ? controller.userName.value
-                    : 'Guest';
-                return Text(
-                  'Hello $name,',
-                  style: const TextStyle(color: AppColors.white, fontSize: 18),
-                );
-              }),
-              const SizedBox(height: 4),
-              const Text(
-                "Welcome to Padel app",
-                style: TextStyle(color: AppColors.white, fontSize: 14),
-              ),
-            ],
+          title: LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  // LEFT: greeting text
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Obx(() {
+                          final name = controller.userName.value.isNotEmpty
+                              ? controller.userName.value
+                              : 'Guest';
+                          return Text(
+                            'Hello $name,',
+                            style: const TextStyle(
+                              color: AppColors.white,
+                              fontSize: 14,
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: 4),
+                        const Text(
+                          "Welcome to Padel app",
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+
+                  // CENTER: circular responsive logo
+                  Align(
+                    alignment: const Alignment(0.17, 0),
+                    child: SizedBox(
+                      height: kToolbarHeight * 0.85,
+                      width: kToolbarHeight * 0.85,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 1,
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(1),
+                        child: ClipOval(
+                          child: Image.asset(
+                            AppImages.homelogo,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           actions: [
             Padding(

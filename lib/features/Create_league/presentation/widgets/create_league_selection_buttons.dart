@@ -4,10 +4,16 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
   final String selectedType;
   final String selectedMatchFormat;
   final String selectedTiebreak;
+  final String selectedMatchPlay;
+  final String selectedLeagueType;
+  final String selectedPlayerLevel;
   final bool allowSubstitutes;
   final Function(String) onTypeChanged;
   final Function(String) onMatchFormatChanged;
   final Function(String) onTiebreakChanged;
+  final Function(String) onMatchPlayChanged;
+  final Function(String) onLeagueTypeChanged;
+  final Function(String) onPlayerLevelChanged;
   final Function(bool) onAllowSubstitutesChanged;
 
   const CreateLeagueSelectionButtons({
@@ -15,10 +21,16 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
     required this.selectedType,
     required this.selectedMatchFormat,
     required this.selectedTiebreak,
+    required this.selectedMatchPlay,
+    required this.selectedLeagueType,
+    required this.selectedPlayerLevel,
     required this.allowSubstitutes,
     required this.onTypeChanged,
     required this.onMatchFormatChanged,
     required this.onTiebreakChanged,
+    required this.onMatchPlayChanged,
+    required this.onLeagueTypeChanged,
+    required this.onPlayerLevelChanged,
     required this.onAllowSubstitutesChanged,
   });
 
@@ -124,6 +136,98 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 24),
+
+        // Match Play with others team
+        const Text(
+          "Match Play with others team",
+          style: TextStyle(color: Colors.white, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildSelectionButton(
+              'Once',
+              selectedMatchPlay == 'Once',
+                  () => onMatchPlayChanged('Once'),
+            ),
+            const SizedBox(width: 7),
+            _buildSelectionButton(
+              'Twice',
+              selectedMatchPlay == 'Twice',
+                  () => onMatchPlayChanged('Twice'),
+            ),
+            const SizedBox(width: 7),
+            _buildSelectionButton(
+              'Thrice',
+              selectedMatchPlay == 'Thrice',
+                  () => onMatchPlayChanged('Thrice'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // League Type
+        const Text(
+          "League Type",
+          style: TextStyle(color: Colors.white, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildSelectionButton(
+              'Public',
+              selectedLeagueType == 'Public',
+                  () => onLeagueTypeChanged('Public'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // Player Levels Dropdown
+        const Text(
+          "Player Levels",
+          style: TextStyle(color: Colors.white, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 38,
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: Colors.white30),
+          ),
+          child: DropdownButtonFormField<String>(
+            value: selectedPlayerLevel.isEmpty ? null : selectedPlayerLevel,
+            hint: const Text(
+              'Select Player Level',
+              style: TextStyle(color: Color(0xFFCACACA), fontSize: 14),
+            ),
+            dropdownColor: Colors.grey[900],
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              border: InputBorder.none,
+            ),
+            items: [
+              'Beginner',
+              'Intermediate',
+              'Intermediate high',
+              'Advanced 4.5+',
+              'Pro',
+            ].map((level) => DropdownMenuItem(
+              value: level,
+              child: Text(level),
+            )).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                onPlayerLevelChanged(value);
+              }
+            },
+          ),
+        ),
       ],
     );
   }
@@ -136,8 +240,8 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? Color(0xFF2AAF08) : Colors.black,
-          side: isSelected ? null : const BorderSide(color: Color(0xFF2AAF08)),
+          backgroundColor: isSelected ? const Color(0xFF2AAF08) : Colors.black,
+          side: const BorderSide(color: Color(0xFF2AAF08)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6),
           ),

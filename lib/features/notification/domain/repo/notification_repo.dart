@@ -12,4 +12,6 @@ abstract class NotificationRepo {
   NetworkResult<NotificationResponseModel> markAsRead(
     NotificationRequestModel request,
   );
+  
+  NetworkResult<List<NotificationResponseModel>> getNotificationsByUserId(String userId);
 }

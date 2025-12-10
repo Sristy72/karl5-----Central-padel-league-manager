@@ -1,7 +1,9 @@
 class ApiConstants {
   /// [Base Configuration]
-  // static const String baseDomain = 'http://10.10.5.91:5001';
+  // static const String baseDomain = 'https://karlfive223-backend.onrender.com';
+  // static const String baseDomain = 'http://72.61.161.196';
   static const String baseDomain = 'http://72.61.161.196';
+
   static const String baseUrl = '$baseDomain/api/v1';
 
   /// [Headers]
@@ -58,6 +60,8 @@ class NotificationEndpoints {
   static const String _base = '${ApiConstants.baseUrl}/notification';
 
   final String getnotifications = '$_base/getnotifications';
+  
+  String getNotificationsByUserId(String userId) => '$_base/$userId';
 }
 
 class ContactEndpoints {
