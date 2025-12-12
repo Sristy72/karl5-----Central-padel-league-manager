@@ -14,7 +14,7 @@ class CreateLeagueAppBar extends StatelessWidget
     return AppBar(
       backgroundColor: AppColors.leagueBackgroundGrey,
       elevation: 0,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       titleSpacing: 0,
       title: Padding(
         padding: const EdgeInsets.all(25.0),
