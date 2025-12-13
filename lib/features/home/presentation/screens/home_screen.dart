@@ -22,6 +22,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     final controller = Get.put(HomeController());
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: PreferredSize(
@@ -41,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxWidth: constraints.maxWidth * 0.5,
+                        maxWidth: constraints.maxWidth * 0.45,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,20 +54,20 @@ class HomeScreen extends StatelessWidget {
                                 : 'Guest';
                             return Text(
                               'Hello $name,',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.white,
-                                fontSize: 14,
+                                fontSize: screenWidth < 350 ? 12 : 14,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             );
                           }),
-                          const SizedBox(height: 4),
-                          const Text(
+                          SizedBox(height: screenWidth < 350 ? 2 : 4),
+                          Text(
                             "Welcome to Padel app",
                             style: TextStyle(
                               color: AppColors.white,
-                              fontSize: 10,
+                              fontSize: screenWidth < 350 ? 8 : 10,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -79,7 +80,10 @@ class HomeScreen extends StatelessWidget {
 
                   // CENTER: circular responsive logo
                   Align(
-                    alignment: const Alignment(0.17, 0),
+                    alignment: Alignment(
+                      screenWidth < 350 ? 0.2 : 0.17,
+                      0,
+                    ),
                     child: SizedBox(
                       height: kToolbarHeight * 0.85,
                       width: kToolbarHeight * 0.85,
@@ -107,15 +111,22 @@ class HomeScreen extends StatelessWidget {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.only(right: 12),
+              padding: EdgeInsets.only(right: screenWidth < 350 ? 8 : 12),
               child: CircleAvatar(
+                radius: screenWidth < 350 ? 16 : 20,
                 backgroundColor: Colors.grey[850],
                 child: IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: () {
                     // TODO: button logic here
                     Get.to(() => CreateLeagueScreen());
                   },
-                  icon: const Icon(Icons.add, color: Colors.white),
+                  icon: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: screenWidth < 350 ? 18 : 20,
+                  ),
                 ),
               ),
             ),
@@ -130,9 +141,9 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
+                SizedBox(height: screenWidth < 350 ? 12 : 20),
                 const CustomSearchBar(),
-                const SizedBox(height: 15),
+                SizedBox(height: screenWidth < 350 ? 10 : 15),
 
                 // Show search results when searching, otherwise show regular content
                 Obx(() {
@@ -146,61 +157,65 @@ class HomeScreen extends StatelessWidget {
                   if (controller.isLoading.value) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24.0),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth < 400 ? 12.0 : 24.0,
+                          ),
                           child: Text(
                             "Game Reminder",
                             style: TextStyle(
                               color: AppColors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: screenWidth < 350 ? 16 : 18,
                             ),
                           ),
                         ),
-                        SizedBox(height: 12),
-                        GameReminderShimmer(),
-                        SizedBox(height: 20),
-                        LeagueUpdateShimmer(),
-                        SizedBox(height: 20),
-                        NextMatchShimmer(),
-                        SizedBox(height: 20),
-                        QuickStatsShimmer(),
-                        SizedBox(height: 20),
-                        FixturesShimmer(),
+                        SizedBox(height: screenWidth < 350 ? 8 : 12),
+                        const GameReminderShimmer(),
+                        SizedBox(height: screenWidth < 350 ? 16 : 20),
+                        const LeagueUpdateShimmer(),
+                        SizedBox(height: screenWidth < 350 ? 16 : 20),
+                        const NextMatchShimmer(),
+                        SizedBox(height: screenWidth < 350 ? 16 : 20),
+                        const QuickStatsShimmer(),
+                        SizedBox(height: screenWidth < 350 ? 16 : 20),
+                        const FixturesShimmer(),
                       ],
                     );
                   }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth < 400 ? 12.0 : 24.0,
+                        ),
                         child: Text(
                           "Game Reminder",
                           style: TextStyle(
                             color: AppColors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: screenWidth < 350 ? 16 : 18,
                           ),
                         ),
                       ),
-                      SizedBox(height: 12),
-                      GameReminderWidget(),
-                      SizedBox(height: 20),
-                      LeagueUpdateWidget(),
-                      SizedBox(height: 20),
-                      NextMatchWidget(),
-                      SizedBox(height: 20),
-                      QuickStatsWidget(),
-                      SizedBox(height: 20),
-                      FixturesWidget(),
+                      SizedBox(height: screenWidth < 350 ? 8 : 12),
+                      const GameReminderWidget(),
+                      SizedBox(height: screenWidth < 350 ? 16 : 20),
+                      const LeagueUpdateWidget(),
+                      SizedBox(height: screenWidth < 350 ? 16 : 20),
+                      const NextMatchWidget(),
+                      SizedBox(height: screenWidth < 350 ? 16 : 20),
+                      const QuickStatsWidget(),
+                      SizedBox(height: screenWidth < 350 ? 16 : 20),
+                      const FixturesWidget(),
                     ],
                   );
                 }),
 
-                const SizedBox(height: 20),
+                SizedBox(height: screenWidth < 350 ? 12 : 20),
               ],
             ),
           ),
