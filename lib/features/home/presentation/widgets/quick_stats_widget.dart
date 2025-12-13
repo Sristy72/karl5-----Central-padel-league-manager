@@ -25,155 +25,250 @@ class QuickStatsWidget extends StatelessWidget {
             const SizedBox(height: 8),
 
             //* <--- Table Header --->
-            Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 8,
-                horizontal: MediaQuery.of(context).size.width < 350 ? 8 : 12,
-              ),
-              child: Row(
-                children: const [
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                      "Teams",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      "GP",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      "W",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      "L",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      "Pts",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      "+/-",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
             //! <--- Quick Stats --->
-            ...controller.quickStats.asMap().entries.map((entry) {
-              final index = entry.key;
-              final stat = entry.value;
-              final imageUrl = (stat["imageUrl"] ?? '').toString();
-
-              return Container(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade800, width: 0.5),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    //* <--- Rank + Team Members + Avatar --->
-                    Expanded(
-                      // reduce flex so other columns get slightly more room on narrow screens
-                      flex: MediaQuery.of(context).size.width < 350 ? 2 : 3,
-                      child: Row(
-                        children: [
-                          Text(
-                            "${index + 1}${_getOrdinal(index + 1)}  ",
-                            style: const TextStyle(
-                              color: Colors.white70,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header Row
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: MediaQuery.of(context).size.width < 350
+                          ? 8
+                          : 12,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        SizedBox(
+                          width: 140, // Must match the team column width below
+                          child: Text(
+                            "Teams",
+                            style: TextStyle(
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
                             ),
                           ),
+                        ),
+                        SizedBox(
+                          width: 40,
+                          child: Text(
+                            "GP",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 40,
+                          child: Text(
+                            "W",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 40,
+                          child: Text(
+                            "L",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 50,
+                          child: Text(
+                            "Pts",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 50,
+                          child: Text(
+                            "+/-",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-                          Builder(
-                            builder: (_) {
-                              final controller = Get.find<HomeController>();
-                              final teamName = (stat["name"] ?? '').toString();
+                  // Divider (optional, for visual separation)
+                  Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    color: Colors.grey.shade800,
+                  ),
 
-                              List<Map<String, String>> players = [];
-                              for (final lm in controller.leagueMatches) {
-                                if (lm.teamOne.teamName == teamName) {
-                                  final cap = lm.teamOne.captainName;
-                                  final partner = lm.teamOne.partnerName;
-                                  final logo = lm.teamOne.logoPhotoUrl;
-                                  if (cap.isNotEmpty) {
-                                    players.add({
-                                      'name': cap,
-                                      'imageUrl': logo,
-                                    });
-                                  }
-                                  if (partner.isNotEmpty) {
-                                    players.add({
-                                      'name': partner,
-                                      'imageUrl': logo,
-                                    });
-                                  }
-                                  break;
-                                }
-                                if (lm.teamTwo.teamName == teamName) {
-                                  final cap = lm.teamTwo.captainName;
-                                  final partner = lm.teamTwo.partnerName;
-                                  final logo = lm.teamTwo.logoPhotoUrl;
-                                  if (cap.isNotEmpty) {
-                                    players.add({
-                                      'name': cap,
-                                      'imageUrl': logo,
-                                    });
-                                  }
-                                  if (partner.isNotEmpty) {
-                                    players.add({
-                                      'name': partner,
-                                      'imageUrl': logo,
-                                    });
-                                  }
-                                  break;
-                                }
-                              }
+                  // Data Rows
+                  ...controller.quickStats.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final stat = entry.value;
+                    final imageUrl = (stat["imageUrl"] ?? '').toString();
 
-                              if (players.isNotEmpty) {
-                                //* <--- Render up to two players inline. --->
-                                final toShow = players.take(2).toList();
-                                return Column(
-                                  children: toShow.map((pl) {
-                                    final playerName = pl['name'] ?? '';
-                                    final playerImage = (pl['imageUrl'] ?? '')
+                    return Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.shade800,
+                            width: 0.5,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Team column - same width as header
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width < 350
+                                ? 130
+                                : 160,
+                            child: Row(
+                              children: [
+                                Text(
+                                  "${index + 1}${_getOrdinal(index + 1)}  ",
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+
+                                // ... [Keep your existing Builder with player logic unchanged] ...
+                                Builder(
+                                  builder: (_) {
+                                    final controller =
+                                        Get.find<HomeController>();
+                                    final teamName = (stat["name"] ?? '')
                                         .toString();
+
+                                    List<Map<String, String>> players = [];
+                                    for (final lm in controller.leagueMatches) {
+                                      if (lm.teamOne.teamName == teamName) {
+                                        final cap = lm.teamOne.captainName;
+                                        final partner = lm.teamOne.partnerName;
+                                        final logo = lm.teamOne.logoPhotoUrl;
+                                        if (cap.isNotEmpty) {
+                                          players.add({
+                                            'name': cap,
+                                            'imageUrl': logo,
+                                          });
+                                        }
+                                        if (partner.isNotEmpty) {
+                                          players.add({
+                                            'name': partner,
+                                            'imageUrl': logo,
+                                          });
+                                        }
+                                        break;
+                                      }
+                                      if (lm.teamTwo.teamName == teamName) {
+                                        final cap = lm.teamTwo.captainName;
+                                        final partner = lm.teamTwo.partnerName;
+                                        final logo = lm.teamTwo.logoPhotoUrl;
+                                        if (cap.isNotEmpty) {
+                                          players.add({
+                                            'name': cap,
+                                            'imageUrl': logo,
+                                          });
+                                        }
+                                        if (partner.isNotEmpty) {
+                                          players.add({
+                                            'name': partner,
+                                            'imageUrl': logo,
+                                          });
+                                        }
+                                        break;
+                                      }
+                                    }
+
+                                    if (players.isNotEmpty) {
+                                      //* <--- Render up to two players inline. --->
+                                      final toShow = players.take(2).toList();
+                                      return Column(
+                                        children: toShow.map((pl) {
+                                          final playerName = pl['name'] ?? '';
+                                          final playerImage =
+                                              (pl['imageUrl'] ?? '').toString();
+                                          return Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius:
+                                                    MediaQuery.of(
+                                                          context,
+                                                        ).size.width <
+                                                        350
+                                                    ? 10
+                                                    : 12,
+                                                backgroundColor:
+                                                    Colors.grey[800],
+                                                backgroundImage:
+                                                    playerImage.isNotEmpty
+                                                    ? NetworkImage(playerImage)
+                                                    : null,
+                                                child: playerImage.isEmpty
+                                                    ? const Icon(
+                                                        Icons.person,
+                                                        size: 14,
+                                                        color: Colors.white70,
+                                                      )
+                                                    : null,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              SizedBox(
+                                                width:
+                                                    MediaQuery.of(
+                                                          context,
+                                                        ).size.width <
+                                                        350
+                                                    ? 50
+                                                    : 80,
+                                                child: Text(
+                                                  playerName,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize:
+                                                        MediaQuery.of(
+                                                              context,
+                                                            ).size.width <
+                                                            350
+                                                        ? 12
+                                                        : 14,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      );
+                                    }
+
                                     return Row(
                                       children: [
                                         CircleAvatar(
@@ -182,16 +277,14 @@ class QuickStatsWidget extends StatelessWidget {
                                                     context,
                                                   ).size.width <
                                                   350
-                                              ? 10
-                                              : 12,
-                                          backgroundColor: Colors.grey[800],
-                                          backgroundImage:
-                                              playerImage.isNotEmpty
-                                              ? NetworkImage(playerImage)
+                                              ? 12
+                                              : 14,
+                                          backgroundImage: imageUrl.isNotEmpty
+                                              ? NetworkImage(imageUrl)
                                               : null,
-                                          child: playerImage.isEmpty
+                                          child: imageUrl.isEmpty
                                               ? const Icon(
-                                                  Icons.person,
+                                                  Icons.sports,
                                                   size: 14,
                                                   color: Colors.white70,
                                                 )
@@ -204,120 +297,74 @@ class QuickStatsWidget extends StatelessWidget {
                                                     context,
                                                   ).size.width <
                                                   350
-                                              ? 50
+                                              ? 70
                                               : 80,
                                           child: Text(
-                                            playerName,
-                                            style: TextStyle(
+                                            stat["name"] ?? "",
+                                            style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize:
-                                                  MediaQuery.of(
-                                                        context,
-                                                      ).size.width <
-                                                      350
-                                                  ? 12
-                                                  : 14,
                                             ),
                                             overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
+                                            maxLines: 2,
                                           ),
                                         ),
                                       ],
                                     );
-                                  }).toList(),
-                                );
-                              }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
 
-                              return Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius:
-                                        MediaQuery.of(context).size.width < 350
-                                        ? 12
-                                        : 14,
-                                    backgroundImage: imageUrl.isNotEmpty
-                                        ? NetworkImage(imageUrl)
-                                        : null,
-                                    child: imageUrl.isEmpty
-                                        ? const Icon(
-                                            Icons.sports,
-                                            size: 14,
-                                            color: Colors.white70,
-                                          )
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width < 350
-                                        ? 70
-                                        : 80,
-                                    child: Text(
-                                      stat["name"] ?? "",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
+                          // Numeric columns - give them fixed or reasonable min widths
+                          // Numeric columns - matching header widths
+                          SizedBox(
+                            width: 40,
+                            child: Text(
+                              "${stat["GP"]}",
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 40,
+                            child: Text(
+                              "${stat["W"]}",
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 40,
+                            child: Text(
+                              "${stat["L"]}",
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 50,
+                            child: Text(
+                              "${stat["Pts"]}",
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 50,
+                            child: Text(
+                              "${stat["+/-"]}",
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    // numeric columns: wrap text in FittedBox to avoid overflow and scale down if needed
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["GP"]}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["W"]}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["L"]}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["Pts"]}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["+/-"]}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
+                    );
+                  }),
+                ],
+              ),
+            ),
 
             //* <--- "See All" link --->
             Align(
