@@ -351,17 +351,53 @@ class ProfileContactUsScreen extends StatelessWidget {
 
   // Helper method to launch email
   Future<void> _launchEmail(String email) async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: email,
-    );
+    final Uri emailUri = Uri.parse('mailto:$email');
     
     try {
-      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+      // Use platformDefault mode for better iOS compatibility
+      await launchUrl(emailUri);
+    } catch (e) {
+      // If default mode fails, try external application mode
+      try {
+        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+      } catch (e2) {
+        Get.snackbar(
+          'Error',
+          'Could not open email app. Please email us at: $email',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 4),
+        );
+      }
+    }
+  }
+
+  // Helper method to launch WhatsApp
+  Future<void> _launchWhatsApp(String phoneNumber) async {
+    // Format: +447353129595 -> 447353129595 (remove + for WhatsApp URL)
+    final cleanNumber = phoneNumber.replaceAll('+', '').replaceAll(' ', '');
+    
+    // Try WhatsApp app first (iOS/Android native app)
+    final Uri whatsappAppUri = Uri.parse('whatsapp://send?phone=$cleanNumber');
+    
+    try {
+      if (await canLaunchUrl(whatsappAppUri)) {
+        await launchUrl(whatsappAppUri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (e) {
+      // WhatsApp app not installed, try web version
+    }
+    
+    // Fallback to WhatsApp web
+    final Uri whatsappWebUri = Uri.parse('https://wa.me/$cleanNumber');
+    try {
+      await launchUrl(whatsappWebUri, mode: LaunchMode.externalApplication);
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Could not open email app. Please email us at: $email',
+        'Could not launch WhatsApp. Please install WhatsApp or contact: $phoneNumber',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade700,
         colorText: Colors.white,
@@ -370,41 +406,37 @@ class ProfileContactUsScreen extends StatelessWidget {
     }
   }
 
-  // Helper method to launch WhatsApp
-  Future<void> _launchWhatsApp(String phoneNumber) async {
-    // Format: +447353129595 -> 447353129595 (remove + for WhatsApp URL)
-    final cleanNumber = phoneNumber.replaceAll('+', '');
-    final Uri whatsappUri = Uri.parse('https://wa.me/$cleanNumber');
-    
-    if (await canLaunchUrl(whatsappUri)) {
-      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
-    } else {
-      Get.snackbar(
-        'Error',
-        'Could not launch WhatsApp',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade700,
-        colorText: Colors.white,
-      );
-    }
-  }
-
   // Helper method to open location on Google Maps
   Future<void> _openMapLocation(String location) async {
-    // Use Google Maps URL for the location
-    final Uri mapUri = Uri.parse(
-      'https://www.google.com/maps/search/$location',
+    final encodedLocation = Uri.encodeComponent(location);
+    
+    // Try Apple Maps first (for iOS)
+    final Uri appleMapsUri = Uri.parse('maps://?q=$encodedLocation');
+    
+    try {
+      if (await canLaunchUrl(appleMapsUri)) {
+        await launchUrl(appleMapsUri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    } catch (e) {
+      // Apple Maps not available, try Google Maps
+    }
+    
+    // Fallback to Google Maps (web or app)
+    final Uri googleMapsUri = Uri.parse(
+      'https://www.google.com/maps/search/$encodedLocation',
     );
     
-    if (await canLaunchUrl(mapUri)) {
-      await launchUrl(mapUri, mode: LaunchMode.externalApplication);
-    } else {
+    try {
+      await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
+    } catch (e) {
       Get.snackbar(
         'Error',
-        'Could not launch maps',
+        'Could not launch maps for: $location',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade700,
         colorText: Colors.white,
+        duration: const Duration(seconds: 3),
       );
     }
   }

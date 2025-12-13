@@ -53,5 +53,17 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to your photo library to select and upload images.</string>
 
+	<!-- URL Schemes for url_launcher -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mailto</string>
+		<string>tel</string>
+		<string>sms</string>
+		<string>whatsapp</string>
+		<string>maps</string>
+		<string>http</string>
+		<string>https</string>
+	</array>
+
 </dict>
 </plist>
