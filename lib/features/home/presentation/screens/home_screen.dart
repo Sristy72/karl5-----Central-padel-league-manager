@@ -39,31 +39,40 @@ class HomeScreen extends StatelessWidget {
                   // LEFT: greeting text
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Obx(() {
-                          final name = controller.userName.value.isNotEmpty
-                              ? controller.userName.value
-                              : 'Guest';
-                          return Text(
-                            'Hello $name,',
-                            style: const TextStyle(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth * 0.5,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Obx(() {
+                            final name = controller.userName.value.isNotEmpty
+                                ? controller.userName.value
+                                : 'Guest';
+                            return Text(
+                              'Hello $name,',
+                              style: const TextStyle(
+                                color: AppColors.white,
+                                fontSize: 14,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            );
+                          }),
+                          const SizedBox(height: 4),
+                          const Text(
+                            "Welcome to Padel app",
+                            style: TextStyle(
                               color: AppColors.white,
-                              fontSize: 14,
+                              fontSize: 10,
                             ),
-                          );
-                        }),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Welcome to Padel app",
-                          style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 10,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
 

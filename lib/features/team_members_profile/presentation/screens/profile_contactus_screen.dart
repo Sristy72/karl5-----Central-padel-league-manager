@@ -351,27 +351,21 @@ class ProfileContactUsScreen extends StatelessWidget {
 
   // Helper method to launch email
   Future<void> _launchEmail(String email) async {
-    final Uri emailUri = Uri.parse('mailto:$email');
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+    );
     
     try {
-      if (await canLaunchUrl(emailUri)) {
-        await launchUrl(emailUri);
-      } else {
-        Get.snackbar(
-          'Error',
-          'No email app found',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade700,
-          colorText: Colors.white,
-        );
-      }
+      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Could not launch email app: $e',
+        'Could not open email app. Please email us at: $email',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade700,
         colorText: Colors.white,
+        duration: const Duration(seconds: 4),
       );
     }
   }
