@@ -37,10 +37,10 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _totalGameWeeksController = TextEditingController(text: '0',);
+  final TextEditingController _totalGameWeeksController = TextEditingController(
+    text: '0',
+  );
   final TextEditingController _entryFeeController = TextEditingController();
-
-
 
   File? _logoImage;
   File? _bannerImage;
@@ -124,8 +124,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
 
             const SizedBox(height: 8),
 
-          // New Entry Fee Field
-
+            // New Entry Fee Field
             TextField(
               controller: _entryFeeController,
               style: const TextStyle(color: Colors.white),
@@ -149,12 +148,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
               ),
             ),
 
-
-
             const SizedBox(height: 24),
-
-
-
 
             CreateLeagueSelectionButtons(
               selectedType: _selectedType,
@@ -347,20 +341,17 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     );
 
     if (success) {
-      // Save league type BEFORE resetting form
-      final isPrivateLeague = _selectedLeagueType == 'Private';
-      print('💾 League Type before reset: $_selectedLeagueType');
-      
-      _resetForm();
-      
-      // Show private league code dialog if league type is private
-      if (isPrivateLeague) {
-        // MUST show popup for private leagues
-        print('🔒 Private League Created - Showing Code Dialog');
-        _showPrivateLeagueCodeDialog();
+      // Get the league code from API response
+      final leagueCode = apiController.createdLeague.value?.leagueCode?.trim();
+
+      // Show league code dialog for all leagues (private and public)
+      if (leagueCode != null && leagueCode.isNotEmpty) {
+        print('🎯 League Created - Showing Code: $leagueCode');
+        _showLeagueCodeDialog(leagueCode);
       } else {
-        // For public leagues, show success snackbar and navigate to home
-        print('🌍 Public League Created - Navigating to Home');
+        // Fallback if no league code in response
+        print('⚠️ No league code in response');
+        _resetForm();
         Get.snackbar(
           'Success',
           'League published successfully!',
@@ -369,7 +360,6 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
           colorText: Colors.white,
           duration: const Duration(seconds: 2),
         );
-        // Navigate to home screen and clear navigation stack
         Get.offAll(() => const HomeScreen());
       }
     } else {
@@ -404,25 +394,19 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
     });
   }
 
-  /// Generate a random 5-digit number for private leagues
-  String _generateRandomCode() {
-    // Generate random 5-digit number (10000 to 99999)
-    final random = DateTime.now().microsecondsSinceEpoch % 90000 + 10000;
-    return random.toString();
-  }
-
-  /// Show dialog with private league code
-  void _showPrivateLeagueCodeDialog() {
-    final leagueCode = _generateRandomCode();
-    print('🎲 Generated 5-digit code: $leagueCode');
+  /// Show dialog with league code from API response
+  void _showLeagueCodeDialog(String leagueCode) {
+    print('📱 Building League Code Dialog with code: $leagueCode');
 
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
-        print('📱 Building Private League Dialog...');
         return PrivateLeagueCodeDialog(leagueCode: leagueCode);
       },
-    );
+    ).then((_) {
+      // Redirect to Home Screen when dialog is dismissed (via tap outside, cancel, or copy)
+      Get.offAll(() => const HomeScreen());
+    });
   }
 }

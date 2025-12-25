@@ -10,6 +10,8 @@ import 'models/create_league_request_model.dart';
 import 'models/create_league_response_model.dart';
 import 'dart:convert';
 
+import 'models/league_model.dart';
+
 class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
   final ApiClient _apiClient;
 
@@ -17,7 +19,7 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
     : _apiClient = apiClient;
 
   @override
-  NetworkResult<CreateLeagueResponseModel> createLeague(
+  NetworkResult<LeagueModel> createLeague(
       CreateLeagueRequestModel request, {
         File? logoFile,
         File? bannerFile,
@@ -66,11 +68,10 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
       }
 
       // Send as multipart/form-data
-      return _apiClient.postFormData<CreateLeagueResponseModel>(
+      return _apiClient.postFormData<LeagueModel>(
         '${ApiConstants.baseUrl}/league/create',
         formData: formData,
-        fromJsonT: (json) =>
-            CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
+        fromJsonT: (json) => LeagueModel.fromJson(json as Map<String, dynamic>),
       );
 
     } catch (e, st) {
@@ -82,11 +83,10 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
 
 
   @override
-  NetworkResult<CreateLeagueResponseModel> getLeagueById(String id) {
-    return _apiClient.get<CreateLeagueResponseModel>(
+  NetworkResult<LeagueModel> getLeagueById(String id) {
+    return _apiClient.get<LeagueModel>(
       '${ApiConstants.baseUrl}/league/$id',
-      fromJsonT: (json) =>
-          CreateLeagueResponseModel.fromJson(json as Map<String, dynamic>),
+      fromJsonT: (json) => LeagueModel.fromJson(json as Map<String, dynamic>),
     );
   }
 }

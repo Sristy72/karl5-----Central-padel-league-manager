@@ -5,6 +5,8 @@ import '../../data/create_league_repository.dart';
 import '../../data/models/create_league_request_model.dart';
 import '../../../auth/presentation/controller/auth_controller.dart';
 import '../../data/models/league_model.dart';
+import '../../data/models/create_league_response_model.dart';
+
 
 class CreateLeagueController extends GetxController {
   final CreateLeagueRepository repository;
@@ -15,6 +17,7 @@ class CreateLeagueController extends GetxController {
   var successMessage = ''.obs;
   var errorMessage = ''.obs;
   var league = Rxn<LeagueModel>();
+  var createdLeague = Rxn<LeagueModel>();
 
   Future<bool> createLeague(
     CreateLeagueRequestModel request, {
@@ -112,6 +115,12 @@ class CreateLeagueController extends GetxController {
       },
       (success) {
         successMessage(success.message);
+        createdLeague.value = success.data;
+
+        // ✅ Debug: leagueCode print করে confirm করবে
+        print("✅ Created League Name: ${createdLeague.value?.leagueName}");
+        print("✅ Created League Code: ${createdLeague.value?.leagueCode}");
+
         isLoading(false);
         return true;
       },
@@ -132,8 +141,7 @@ class CreateLeagueController extends GetxController {
           return false;
         },
         (success) {
-          // success.data is CreateLeagueResponseModel; its .data is LeagueModel?
-          league.value = success.data.data;
+          league.value = success.data;
           isLoading(false);
           return true;
         },
