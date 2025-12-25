@@ -33,7 +33,6 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
         MapEntry('leagueName', request.leagueName),
         MapEntry('description', request.description),
         MapEntry('startDate', request.startDate),
-        MapEntry('endDate', request.endDate ?? ''),
         MapEntry('location', request.location),
         MapEntry('addTeam', ''),
         MapEntry('type', request.type),

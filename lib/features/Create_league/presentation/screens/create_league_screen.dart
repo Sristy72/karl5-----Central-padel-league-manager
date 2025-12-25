@@ -322,7 +322,6 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       leagueName: _leagueNameController.text.trim(),
       description: _descriptionController.text.trim(),
       startDate: formattedStartDate,
-      endDate: formattedEndDate,
       location: _locationController.text.trim(),
       totalGameWeeks: totalGameWeeks,
       type: _selectedType,

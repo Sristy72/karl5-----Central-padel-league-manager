@@ -59,6 +59,7 @@ class _LeagueDetailsScreenState extends State<LeagueDetailsScreen>
             ? widget.league.bannerImage!
             : 'assets/images/example_bg.jpg',
         tabController: _tabController,
+        leagueCode: widget.league.leagueCode,
       ),
       body: TabBarView(
         controller: _tabController,

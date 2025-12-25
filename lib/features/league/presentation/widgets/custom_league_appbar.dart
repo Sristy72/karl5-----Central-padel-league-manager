@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get/utils.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../features/Create_league/presentation/widgets/private_league_code_dialog.dart';
 
 class CustomLeagueAppbar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -11,16 +12,41 @@ class CustomLeagueAppbar extends StatelessWidget
   final String backgroundImagePath;
   final TabController tabController;
 
+  final String? leagueCode;
+
   const CustomLeagueAppbar({
     super.key,
     required this.leagueName,
     required this.leagueLogoPath,
     required this.backgroundImagePath,
     required this.tabController,
+    this.leagueCode,
   });
 
   @override
   Size get preferredSize => const Size.fromHeight(200.0);
+
+  void _showLeagueCodeDialog(BuildContext context, String code) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        // Use the same dialog widget as in CreateLeagueScreen
+        // Ensure this widget is accessible or copy it if needed.
+        // Assuming PrivateLeagueCodeDialog is available or I need to import it.
+        // Since I cannot easily import from features/Create_league if not exported, I will duplicate or move it.
+        // Checking imports...
+        // I will use a direct import if possible or implement the dialog inline if simpler/safer to avoid coupling.
+        // Given constraints, I'll assume the path is accessible.
+        // Actually, importing across features is okay but might need relative path correction.
+        // Path: ../../Create_league/presentation/widgets/private_league_code_dialog.dart
+        // This file is in features/Create_league/presentation/widgets/
+        // Current file is features/league/presentation/widgets/
+        // Proper relative path: ../../../Create_league/presentation/widgets/private_league_code_dialog.dart
+        return PrivateLeagueCodeDialog(leagueCode: code);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,15 +103,20 @@ class CustomLeagueAppbar extends StatelessWidget
                         Get.back();
                       },
                     ),
-                    //! Favorite icon
-                    IconButton(
-                      icon: const Image(
-                        height: 22,
-                        width: 22,
-                        image: AssetImage("assets/images/star_icon_off.png"),
-                      ),
-                      onPressed: () {}, // TODO: Add favorite logic here
-                    ),
+                    //! Share icon
+                    if (leagueCode != null && leagueCode!.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.share,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        onPressed: () {
+                          _showLeagueCodeDialog(context, leagueCode!);
+                        },
+                      )
+                    else
+                      const SizedBox(width: 48), // Placeholder to keep layout balanced
                   ],
                 ),
               ),

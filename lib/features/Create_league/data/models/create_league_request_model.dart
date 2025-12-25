@@ -3,7 +3,6 @@ class CreateLeagueRequestModel {
   final String leagueName;
   final String description;
   final String startDate;
-  final String? endDate;
   final String location;
   final String? price;
   final int totalGameWeeks;
@@ -19,7 +18,6 @@ class CreateLeagueRequestModel {
     required this.leagueName,
     required this.description,
     required this.startDate,
-    this.endDate,
     required this.location,
     required this.totalGameWeeks,
     required this.type,

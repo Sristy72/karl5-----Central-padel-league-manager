@@ -17,6 +17,7 @@ class League {
   final String matchFormat;
   final String tiebreakOption;
   final bool allowSubstitutes;
+  final String? leagueCode;
 
   League({
     required this.id,
@@ -34,6 +35,7 @@ class League {
     required this.matchFormat,
     required this.tiebreakOption,
     required this.allowSubstitutes,
+    this.leagueCode,
   });
 
   factory League.fromJson(Map<String, dynamic> json) {
@@ -67,6 +69,7 @@ class League {
       matchFormat: json['matchFormat'] ?? '',
       tiebreakOption: json['tiebreakOption'] ?? '',
       allowSubstitutes: json['allowSubstitutes'] ?? false,
+      leagueCode: json['leagueCode'],
     );
   }
 }
