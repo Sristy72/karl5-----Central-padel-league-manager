@@ -5,6 +5,10 @@ import '../models/standing_model.dart';
 
 abstract class LeagueRepository {
   NetworkResult<List<League>> getAllLeagues();
+  NetworkResult<Map<String, dynamic>> getLeaguesPaged({
+    int page = 1,
+    int limit = 10,
+  });
   NetworkResult<List<Match>> getMatchesByLeague(String leagueId);
   NetworkResult<List<Standing>> getStandingsAll();
   NetworkResult<Map<String, dynamic>> updateMatch(
