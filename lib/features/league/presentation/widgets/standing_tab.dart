@@ -69,9 +69,9 @@ class _StandingTabState extends State<StandingTab> {
         'won': TextEditingController(text: standing.won.toString()),
         'drawn': TextEditingController(text: standing.drawn.toString()),
         'lost': TextEditingController(text: standing.lost.toString()),
-        'goalDifference': TextEditingController(
-          text: standing.goalDifference.toString(),
-        ),
+        // 'goalDifference': TextEditingController(
+        //   text: standing.goalDifference.toString(),
+        // ),
         'points': TextEditingController(text: standing.points.toString()),
       };
     }
@@ -268,15 +268,15 @@ class _StandingTabState extends State<StandingTab> {
                     ),
                   ),
                 ),
-                DataColumn(
-                  label: Text(
-                    '+/-',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                // DataColumn(
+                //   label: Text(
+                //     '+/-',
+                //     style: TextStyle(
+                //       fontWeight: FontWeight.bold,
+                //       color: Colors.white,
+                //     ),
+                //   ),
+                // ),
                 DataColumn(
                   label: Text(
                     'PTS',
@@ -483,34 +483,34 @@ class _StandingTabState extends State<StandingTab> {
                               textAlign: TextAlign.center,
                             ),
                     ),
-                    DataCell(
-                      isEditing
-                          ? SizedBox(
-                              width: 25,
-                              child: TextField(
-                                controller:
-                                    _controllers[index]!['goalDifference'],
-                                keyboardType: TextInputType.number,
-                                style: TextStyle(fontSize: 11),
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 2,
-                                    vertical: 2,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  isDense: true,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              standing.goalDifference.toString(),
-                              style: TextStyle(fontSize: 11),
-                              textAlign: TextAlign.center,
-                            ),
-                    ),
+                    // DataCell(
+                    //   isEditing
+                    //       ? SizedBox(
+                    //           width: 25,
+                    //           child: TextField(
+                    //             controller:
+                    //                 _controllers[index]!['goalDifference'],
+                    //             keyboardType: TextInputType.number,
+                    //             style: TextStyle(fontSize: 11),
+                    //             textAlign: TextAlign.center,
+                    //             decoration: InputDecoration(
+                    //               contentPadding: EdgeInsets.symmetric(
+                    //                 horizontal: 2,
+                    //                 vertical: 2,
+                    //               ),
+                    //               border: OutlineInputBorder(
+                    //                 borderRadius: BorderRadius.circular(4),
+                    //               ),
+                    //               isDense: true,
+                    //             ),
+                    //           ),
+                    //         )
+                    //       : Text(
+                    //           standing.goalDifference.toString(),
+                    //           style: TextStyle(fontSize: 11),
+                    //           textAlign: TextAlign.center,
+                    //         ),
+                    // ),
                     DataCell(
                       isEditing
                           ? SizedBox(
