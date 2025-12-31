@@ -18,6 +18,7 @@ class LeagueController extends GetxController {
   var errorMessage = ''.obs;
   // Pagination
   var page = 1;
+  // Use paginated requests (10 per page) — controller will request next pages
   final int limit = 10;
   var total = 0.obs;
   var isFetchingMore = false.obs;
@@ -47,11 +48,7 @@ class LeagueController extends GetxController {
         errorMessage(failure.message);
       }, (success) {
         try {
-          final raw = success.data as Map<String, dynamic>;
-          final data = raw['data'] as List<dynamic>? ?? [];
-          final meta = raw['meta'] as Map<String, dynamic>?;
-
-          final fetched = data.map((e) => League.fromJson(e)).toList();
+          final fetched = success.data ?? <League>[];
 
           if (refresh) {
             leagues.assignAll(fetched);
@@ -59,16 +56,16 @@ class LeagueController extends GetxController {
             leagues.addAll(fetched);
           }
 
-          if (meta != null) {
-            total.value = meta['total'] as int? ?? total.value;
-          }
-
-          // if there are more pages, increment page
-          if (leagues.length < total.value) {
+          // If we received a full page, assume there may be more pages.
+          // Otherwise we've reached the end.
+          if (fetched.length == limit) {
             page++;
+          } else {
+            // no more pages — set total to current count to prevent further requests
+            total.value = leagues.length;
           }
         } catch (e) {
-          errorMessage('Failed to parse leagues');
+          errorMessage('Failed to parse leagues: $e');
         }
       });
     } catch (e) {
