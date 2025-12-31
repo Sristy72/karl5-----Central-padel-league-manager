@@ -78,15 +78,15 @@ class QuickStatsWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: Text(
-                      "+/-",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: Text(
+                  //     "+/-",
+                  //     style: TextStyle(
+                  //       color: Colors.white,
+                  //       fontWeight: FontWeight.bold,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -305,15 +305,15 @@ class QuickStatsWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["+/-"]}",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: FittedBox(
+                    //     fit: BoxFit.scaleDown,
+                    //     child: Text(
+                    //       "${stat["+/-"]}",
+                    //       style: const TextStyle(color: Colors.white),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               );
