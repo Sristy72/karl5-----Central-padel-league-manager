@@ -15,6 +15,29 @@ class LeaguesScreen extends StatefulWidget {
 }
 
 class _LeaguesScreenState extends State<LeaguesScreen> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final controller = Get.find<LeagueController>();
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      controller.fetchNextPage();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LeagueController>();
@@ -30,9 +53,19 @@ class _LeaguesScreenState extends State<LeaguesScreen> {
           return const Center(child: Text('No leagues available'));
         } else {
           return ListView.builder(
-            itemCount: controller.leagues.length,
+            controller: _scrollController,
+            itemCount: controller.leagues.length +
+                (controller.isFetchingMore.value ? 1 : 0),
             itemBuilder: (context, index) {
-              return LeagueCard(league: controller.leagues[index]);
+              if (index < controller.leagues.length) {
+                return LeagueCard(league: controller.leagues[index]);
+              }
+
+              // bottom loader
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Center(child: CircularProgressIndicator()),
+              );
             },
           );
         }
