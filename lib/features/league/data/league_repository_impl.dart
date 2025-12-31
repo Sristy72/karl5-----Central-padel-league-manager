@@ -22,15 +22,17 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
-  NetworkResult<Map<String, dynamic>> getLeaguesPaged({
+  NetworkResult<List<League>> getLeaguesPaged({
     int page = 1,
     int limit = 10,
   }) {
     final endpoint = '${ApiConstants.baseUrl}/league/all-league';
-    return _apiClient.get<Map<String, dynamic>>(
+    return _apiClient.get<List<League>>(
       endpoint,
       queryParameters: {'page': page, 'limit': limit},
-      fromJsonT: (json) => json as Map<String, dynamic>,
+      fromJsonT: (json) => (json as List)
+          .map((item) => League.fromJson(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 
