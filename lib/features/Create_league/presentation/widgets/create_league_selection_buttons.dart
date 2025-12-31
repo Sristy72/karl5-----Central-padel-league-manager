@@ -36,6 +36,9 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final small = screenWidth < 350;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,19 +48,12 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 14),
         ),
         const SizedBox(height: 8),
-        Row(
+        Wrap(
+          spacing: 7,
+          runSpacing: 8,
           children: [
-            _buildSelectionButton(
-              'Singles',
-              selectedType == 'Singles',
-                  () => onTypeChanged('Singles'),
-            ),
-            const SizedBox(width: 7),
-            _buildSelectionButton(
-              'Doubles',
-              selectedType == 'Doubles',
-                  () => onTypeChanged('Doubles'),
-            ),
+            _buildSelectionButton(context, 'Singles', selectedType == 'Singles', () => onTypeChanged('Singles')),
+            _buildSelectionButton(context, 'Doubles', selectedType == 'Doubles', () => onTypeChanged('Doubles')),
           ],
         ),
         const SizedBox(height: 16),
@@ -68,19 +64,12 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 14),
         ),
         const SizedBox(height: 8),
-        Row(
+        Wrap(
+          spacing: 7,
+          runSpacing: 8,
           children: [
-            _buildSelectionButton(
-              'Best of 3 sets',
-              selectedMatchFormat == 'Best of 3 sets',
-                  () => onMatchFormatChanged('Best of 3 sets'),
-            ),
-            const SizedBox(width: 7),
-            _buildSelectionButton(
-              'Best of 5 sets',
-              selectedMatchFormat == 'Best of 5 sets',
-                  () => onMatchFormatChanged('Best of 5 sets'),
-            ),
+            _buildSelectionButton(context, 'Best of 3 sets', selectedMatchFormat == 'Best of 3 sets', () => onMatchFormatChanged('Best of 3 sets')),
+            _buildSelectionButton(context, 'Best of 5 sets', selectedMatchFormat == 'Best of 5 sets', () => onMatchFormatChanged('Best of 5 sets')),
           ],
         ),
         const SizedBox(height: 16),
@@ -91,19 +80,12 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 14),
         ),
         const SizedBox(height: 8),
-        Row(
+        Wrap(
+          spacing: 7,
+          runSpacing: 8,
           children: [
-            _buildSelectionButton(
-              'Standard 7-point',
-              selectedTiebreak == 'Standard 7-point',
-                  () => onTiebreakChanged('Standard 7-point'),
-            ),
-            const SizedBox(width: 7),
-            _buildSelectionButton(
-              'No tiebreak',
-              selectedTiebreak == 'No tiebreak',
-                  () => onTiebreakChanged('No tiebreak'),
-            ),
+            _buildSelectionButton(context, 'Standard 7-point', selectedTiebreak == 'Standard 7-point', () => onTiebreakChanged('Standard 7-point')),
+            _buildSelectionButton(context, 'No tiebreak', selectedTiebreak == 'No tiebreak', () => onTiebreakChanged('No tiebreak')),
           ],
         ),
         const SizedBox(height: 24),
@@ -114,8 +96,8 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 12,
-                height: 12,
+                width: small ? 10 : 12,
+                height: small ? 10 : 12,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.green, width: 1),
@@ -123,7 +105,7 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
                 child: Center(
                   child: Icon(
                     Icons.circle,
-                    size: 10,
+                    size: small ? 8 : 10,
                     color: allowSubstitutes ? Colors.green : Colors.transparent,
                   ),
                 ),
@@ -144,25 +126,13 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 14),
         ),
         const SizedBox(height: 8),
-        Row(
+        Wrap(
+          spacing: 7,
+          runSpacing: 8,
           children: [
-            _buildSelectionButton(
-              'Once',
-              selectedMatchPlay == 'Once',
-                  () => onMatchPlayChanged('Once'),
-            ),
-            const SizedBox(width: 7),
-            _buildSelectionButton(
-              'Twice',
-              selectedMatchPlay == 'Twice',
-                  () => onMatchPlayChanged('Twice'),
-            ),
-            const SizedBox(width: 7),
-            _buildSelectionButton(
-              'Thrice',
-              selectedMatchPlay == 'Thrice',
-                  () => onMatchPlayChanged('Thrice'),
-            ),
+            _buildSelectionButton(context, 'Once', selectedMatchPlay == 'Once', () => onMatchPlayChanged('Once')),
+            _buildSelectionButton(context, 'Twice', selectedMatchPlay == 'Twice', () => onMatchPlayChanged('Twice')),
+            _buildSelectionButton(context, 'Thrice', selectedMatchPlay == 'Thrice', () => onMatchPlayChanged('Thrice')),
           ],
         ),
         const SizedBox(height: 24),
@@ -173,13 +143,11 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 14),
         ),
         const SizedBox(height: 8),
-        Row(
+        Wrap(
+          spacing: 7,
+          runSpacing: 8,
           children: [
-            _buildSelectionButton(
-              'Public',
-              selectedLeagueType == 'Public',
-                  () => onLeagueTypeChanged('Public'),
-            ),
+            _buildSelectionButton(context, 'Public', selectedLeagueType == 'Public', () => onLeagueTypeChanged('Public')),
           ],
         ),
         const SizedBox(height: 24),
@@ -191,7 +159,7 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Container(
-          height: 38,
+          height: small ? 36 : 38,
           decoration: BoxDecoration(
             color: Colors.grey[900],
             borderRadius: BorderRadius.circular(6),
@@ -208,7 +176,7 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
             icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
             decoration: const InputDecoration(
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               border: InputBorder.none,
             ),
             items: [
@@ -232,24 +200,31 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectionButton(String text, bool isSelected,
-      VoidCallback onPressed) {
+  Widget _buildSelectionButton(BuildContext context, String text, bool isSelected, VoidCallback onPressed) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final small = screenWidth < 350;
+    // default width tries to fit two buttons on very small screens, otherwise fixed
+    final btnWidth = small ? (screenWidth - 48) / 2.0 : 116.0;
+
     return SizedBox(
-      height: 29,
-      width: 116,
+      height: 29.0,
+      width: btnWidth,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: isSelected ? const Color(0xFF2AAF08) : Colors.black,
           side: const BorderSide(color: Color(0xFF2AAF08)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(6.0),
           ),
           padding: EdgeInsets.zero,
         ),
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            text,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
         ),
       ),
     );
