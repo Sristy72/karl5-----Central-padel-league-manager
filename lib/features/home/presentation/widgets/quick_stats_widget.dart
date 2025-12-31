@@ -45,6 +45,7 @@ class QuickStatsWidget extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "GP",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -54,6 +55,7 @@ class QuickStatsWidget extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "W",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -63,6 +65,7 @@ class QuickStatsWidget extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "L",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -72,6 +75,7 @@ class QuickStatsWidget extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "Pts",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -270,38 +274,50 @@ class QuickStatsWidget extends StatelessWidget {
                     ),
                     // numeric columns: wrap text in FittedBox to avoid overflow and scale down if needed
                     Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["GP"]}",
-                          style: const TextStyle(color: Colors.white),
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "${stat["GP"]}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
                     Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["W"]}",
-                          style: const TextStyle(color: Colors.white),
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "${stat["W"]}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
                     Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["L"]}",
-                          style: const TextStyle(color: Colors.white),
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "${stat["L"]}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
                     Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${stat["Pts"]}",
-                          style: const TextStyle(color: Colors.white),
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "${stat["Pts"]}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
