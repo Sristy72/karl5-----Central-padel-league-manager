@@ -91,7 +91,7 @@ class _CreateLeagueScreenState extends State<CreateLeagueScreen> {
       appBar: const CreateLeagueAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(
-          top: 13,
+          top: 0,
           left: 24,
           right: 24,
           bottom: 24,
