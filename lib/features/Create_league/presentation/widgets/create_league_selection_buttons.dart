@@ -130,9 +130,9 @@ class CreateLeagueSelectionButtons extends StatelessWidget {
           spacing: 7,
           runSpacing: 8,
           children: [
-            _buildSelectionButton(context, 'Once', selectedMatchPlay == 'Once', () => onMatchPlayChanged('Once')),
-            _buildSelectionButton(context, 'Twice', selectedMatchPlay == 'Twice', () => onMatchPlayChanged('Twice')),
-            _buildSelectionButton(context, 'Thrice', selectedMatchPlay == 'Thrice', () => onMatchPlayChanged('Thrice')),
+            _buildSelectionButton(context, 'Once', selectedMatchPlay == 'once', () => onMatchPlayChanged('once')),
+            _buildSelectionButton(context, 'Twice', selectedMatchPlay == 'twice', () => onMatchPlayChanged('twice')),
+            _buildSelectionButton(context, 'Thrice', selectedMatchPlay == 'thrice', () => onMatchPlayChanged('thrice')),
           ],
         ),
         const SizedBox(height: 24),

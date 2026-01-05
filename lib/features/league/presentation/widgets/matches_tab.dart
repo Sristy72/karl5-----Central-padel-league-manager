@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/network/api_client.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../data/league_repository_impl.dart';
+import '../../models/league_model.dart';
 import '../../models/match_model.dart';
 import '../../models/team_model.dart';
-import '../../models/league_model.dart';
-import '../../data/league_repository_impl.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/network/api_client.dart';
-import 'package:intl/intl.dart';
 
 class MatchesTab extends StatelessWidget {
   final List<Match> matchesData;
@@ -52,6 +53,7 @@ class _MatchCardState extends State<_MatchCard> {
   String? _selectedLeague;
   String? _selectedLeagueId;
   Team? _selectedWinner;
+  bool _isMatchComplete = false;
 
   @override
   void initState() {
@@ -65,6 +67,7 @@ class _MatchCardState extends State<_MatchCard> {
     _selectedDateTime = widget.match.matchDateTime;
     _selectedLeague = widget.match.leagueName;
     _selectedLeagueId = widget.match.leagueId;
+    _isMatchComplete = widget.match.matchStatus.toLowerCase() == 'complete';
 
     // Normalize winner reference to one of the team objects if ids match
     if (widget.match.winnerTeam != null) {
@@ -162,6 +165,13 @@ class _MatchCardState extends State<_MatchCard> {
     if (_selectedWinner != null &&
         _selectedWinner!.id != widget.match.winnerTeam?.id) {
       updates['winnerTeam'] = _selectedWinner!.id;
+    }
+
+    // Update match status (complete or not)
+    final currentStatus = widget.match.matchStatus.toLowerCase();
+    final newStatus = _isMatchComplete ? 'completed' : 'live';
+    if (currentStatus != newStatus) {
+      updates['matchStatus'] = newStatus;
     }
 
     if (updates.isEmpty) {
@@ -480,6 +490,27 @@ class _MatchCardState extends State<_MatchCard> {
                     'Winner',
                     widget.match.winnerTeam?.teamName ?? 'TBD',
                   ),
+
+            // Match Complete Checkbox (only in edit mode)
+            if (_isEditing)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: CheckboxListTile(
+                  title: const Text(
+                    'Is match complete?',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  value: _isMatchComplete,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _isMatchComplete = value ?? false;
+                    });
+                  },
+                  activeColor: Colors.green,
+                  checkColor: Colors.white,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
           ],
         ),
       ),

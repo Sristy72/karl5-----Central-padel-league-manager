@@ -1,15 +1,14 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
+
 import '../../../core/network/api_client.dart';
 import '../../../core/network/constants/api_constants.dart';
 import '../../../core/network/network_result.dart';
 import 'create_league_repository.dart';
 import 'models/create_league_request_model.dart';
-import 'models/create_league_response_model.dart';
-import 'dart:convert';
-
 import 'models/league_model.dart';
 
 class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
@@ -40,6 +39,8 @@ class CreateLeagueRepositoryImpl implements CreateLeagueRepository {
         MapEntry('tiebreakOption', request.tiebreakOption),
         MapEntry('allowSubstitutes', request.allowSubstitutes.toString()),
         MapEntry('totalGameWeeks', request.totalGameWeeks.toString()),
+        MapEntry('matchPlay', request.matchPlay),
+        MapEntry('leagueType', request.leagueType),
         MapEntry('price', request.price ?? ''),
 
       ]);
