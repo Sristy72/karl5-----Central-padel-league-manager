@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:flutx_core/flutx_core.dart';
-// import 'package:get/get_connect/http/src/utils/utils.dart';
-import '../../data/team_repository.dart';
-import '../../models/team_model.dart';
-import '../../data/team_repository_impl.dart';
+import 'package:get/get.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../data/team_repository.dart';
+import '../../data/team_repository_impl.dart';
+import '../../models/team_model.dart';
 
 class TeamsTab extends StatefulWidget {
   final List<Team> teamsData;
@@ -337,9 +336,11 @@ class _TeamGridItem extends StatelessWidget {
                 : const AssetImage('assets/images/group_logo.png')
                       as ImageProvider,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             team.teamName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,

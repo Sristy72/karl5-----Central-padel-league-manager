@@ -22,10 +22,7 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
-  NetworkResult<List<League>> getLeaguesPaged({
-    int page = 1,
-    int limit = 10,
-  }) {
+  NetworkResult<List<League>> getLeaguesPaged({int page = 1, int limit = 10}) {
     final endpoint = '${ApiConstants.baseUrl}/league/all-league';
     return _apiClient.get<List<League>>(
       endpoint,
@@ -42,6 +39,7 @@ class LeagueRepositoryImpl implements LeagueRepository {
     final endpoint = '${ApiConstants.baseUrl}/match/all-match';
     return _apiClient.get<List<Match>>(
       endpoint,
+      queryParameters: {'league': leagueId, 'limit': 1000},
       fromJsonT: (json) {
         final list = (json as List)
             .map((e) => Match.fromJson(e as Map<String, dynamic>))
