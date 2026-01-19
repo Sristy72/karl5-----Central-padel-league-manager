@@ -433,20 +433,20 @@ class _MatchCardState extends State<_MatchCard> {
                     ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _isEditing
-                  ? TextFormField(
-                      controller: _arenaController,
-                      decoration: _inputDecoration("Arena"),
-                      style: const TextStyle(color: Colors.white),
-                    )
-                  : _buildDetailRow(
-                      "assets/images/group_icon.png",
-                      'Arena',
-                      widget.match.venueName,
-                    ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: _isEditing
+            //       ? TextFormField(
+            //           controller: _arenaController,
+            //           decoration: _inputDecoration("Arena"),
+            //           style: const TextStyle(color: Colors.white),
+            //         )
+            //       : _buildDetailRow(
+            //           "assets/images/group_icon.png",
+            //           'Arena',
+            //           widget.match.venueName,
+            //         ),
+            // ),
 
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -544,10 +544,22 @@ class _MatchCardState extends State<_MatchCard> {
                   logoPath,
                   width: 40,
                   height: 40,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.broken_image, color: Colors.white),
+                  errorBuilder: (_, __, ___) => Image.asset(
+                    'assets/images/avatar.png',
+                    width: 40,
+                    height: 40,
+                  ),
                 )
-              : Image.asset(logoPath, width: 40, height: 40),
+              : Image.asset(
+                  logoPath.isNotEmpty ? logoPath : 'assets/images/avatar.png',
+                  width: 40,
+                  height: 40,
+                  errorBuilder: (_, __, ___) => Image.asset(
+                    'assets/images/avatar.png',
+                    width: 40,
+                    height: 40,
+                  ),
+                ),
         ),
         const SizedBox(height: 8),
         Text(name, style: const TextStyle(color: Colors.white, fontSize: 14)),

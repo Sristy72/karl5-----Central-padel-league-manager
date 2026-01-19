@@ -123,14 +123,14 @@ class NextMatchWidget extends StatelessWidget {
                                 color: Colors.black87,
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                textAlign: TextAlign.center,
-                                controller.nextMatchCourt.value,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
+                              // Text(
+                              //   textAlign: TextAlign.center,
+                              //   controller.nextMatchCourt.value,
+                              //   style: const TextStyle(
+                              //     fontWeight: FontWeight.bold,
+                              //     fontSize: 14,
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),

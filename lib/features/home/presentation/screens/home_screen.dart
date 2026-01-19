@@ -36,13 +36,11 @@ class HomeScreen extends StatelessWidget {
               return Stack(
                 alignment: Alignment.center,
                 children: [
-                  // LEFT: greeting text
+                  // LEFT: greeting text with max width constraint
                   Align(
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: constraints.maxWidth * 0.5,
-                      ),
+                      constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.45),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -57,25 +55,22 @@ class HomeScreen extends StatelessWidget {
                                 color: AppColors.white,
                                 fontSize: 14,
                               ),
-                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             );
                           }),
                           const SizedBox(height: 4),
                           const Text(
-                            "Welcome to Padel app",
+                            "Welcome to \nThe Central Padel League App",
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 10,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
                   ),
-
 
                   // CENTER: circular responsive logo
                   Align(
