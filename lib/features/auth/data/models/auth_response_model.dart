@@ -12,10 +12,13 @@ class AuthResponseData {
   });
 
   factory AuthResponseData.fromJson(Map<String, dynamic> json) {
+    // Handle both login response (user field) and register response (result field)
+    final userJson = json['user'] ?? json['result'];
+
     return AuthResponseData(
       accessToken: json['accessToken'] as String,
       refreshToken: json['refreshToken'] as String,
-      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      user: UserModel.fromJson(userJson as Map<String, dynamic>),
     );
   }
 

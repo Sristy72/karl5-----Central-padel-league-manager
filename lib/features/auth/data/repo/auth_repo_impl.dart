@@ -8,6 +8,7 @@ import '../models/otp_request_model.dart';
 import '../models/otp_response_model.dart';
 import '../models/refresh_token_request_model.dart';
 import '../models/refresh_token_response_model.dart';
+import '../models/register_request_model.dart';
 import '../models/reset_password_request_model.dart';
 import '../models/reset_password_response_model.dart';
 import '../models/set_new_password_request_model.dart';
@@ -29,6 +30,14 @@ class AuthRepositoryImpl implements AuthRepository {
     );
   }
 
+  @override
+  NetworkResult<AuthResponseData> register(RegisterRequestModel request) {
+    return _apiClient.post<AuthResponseData>(
+      ApiConstants.auth.register,
+      data: request.toJson(),
+      fromJsonT: (json) => AuthResponseData.fromJson(json),
+    );
+  }
 
   @override
   NetworkResult<ResetPasswordResponseModel> resetPassword(
@@ -51,7 +60,6 @@ class AuthRepositoryImpl implements AuthRepository {
       fromJsonT: (json) => OtpVerificationResponseModel.fromJson(json),
     );
   }
-
 
   @override
   NetworkResult<SetNewPasswordResponseModel> setNewPassword(

@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_karlfive223_manager/core/theme/input_decoration_extensions.dart';
 import 'package:flutter_karlfive223_manager/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:flutter_karlfive223_manager/features/auth/presentation/screens/signup_screen.dart';
 import 'package:flutx_core/flutx_core.dart';
 import 'package:get/get.dart';
 
@@ -34,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen>
   /// [Controller]
   final _authController = Get.find<AuthController>();
   final rememberMeController = Get.put(RememberMeController());
-
 
   @override
   void dispose() {
@@ -265,12 +266,34 @@ class _LoginScreenState extends State<LoginScreen>
 
                         Gap.h16,
 
+                        Center(
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'Want to be a Manager? ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                color: AppColors.rememberMeColor,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'Sign Up Here',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.primaryGreen,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Get.to(() => const SignupScreen());
+                                    },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
 
                         SizedBox(height: 16),
-
-                        // OrDividerWithCircle(),
-
-                        Gap.h16,
 
                         // DifferentLoginApproach(
                         //   text: 'Continue With Google',

@@ -7,6 +7,7 @@ import '../../../home/presentation/screens/home_screen.dart';
 import '../../data/models/login_request_model.dart';
 import '../../data/models/otp_request_model.dart';
 import '../../data/models/refresh_token_request_model.dart';
+import '../../data/models/register_request_model.dart';
 import '../../data/models/reset_password_request_model.dart';
 import '../../data/models/set_new_password_request_model.dart';
 import '../../domain/repo/auth_repo.dart';
@@ -17,7 +18,6 @@ import '../screens/set_new_password_screen.dart';
 class AuthController extends BaseController {
   final AuthRepository _authRepository;
   final AuthStorageService _authStorageService;
-  bool _isSuccess = false;
 
   AuthController(this._authRepository, this._authStorageService);
 
@@ -48,6 +48,50 @@ class AuthController extends BaseController {
           Get.to(HomeScreen());
         } else {
           setError(success.message);
+        }
+        setLoading(false);
+      },
+    );
+  }
+
+  // Register
+  Future<void> register(
+    String name,
+    String email,
+    String password,
+    String phoneNumber,
+  ) async {
+    setLoading(true);
+    setError("");
+
+    final request = RegisterRequestModel(
+      name: name,
+      email: email,
+      password: password,
+      phoneNumber: phoneNumber,
+      role: 'manager', // Default role is manager
+    );
+
+    final result = await _authRepository.register(request);
+
+    result.fold(
+      (fail) {
+        setError(fail.message);
+        setLoading(false);
+      },
+      (success) async {
+        final user = success.data.user;
+        if (user.role == 'manager') {
+          // Store authentication data (token and user info)
+          await _authStorageService.storeAuthData(
+            accessToken: success.data.accessToken,
+            refreshToken: success.data.refreshToken,
+            userId: success.data.user.id,
+          );
+          // Navigate to home screen
+          Get.offAll(() => HomeScreen());
+        } else {
+          setError('Registration is only available for managers');
         }
         setLoading(false);
       },
@@ -157,7 +201,7 @@ class AuthController extends BaseController {
       (fail) {
         DPrint.log("Refresh token failed: ${fail.message}");
         setLoading(false);
-        return _isSuccess = false;
+        return false;
       },
       (success) async {
         DPrint.log("Refresh token success: ${success.message}");
@@ -165,7 +209,7 @@ class AuthController extends BaseController {
         await _authStorageService.storeRefreshToken(success.data.refreshToken);
         // _authStorageService.clearAuthData();
         setLoading(false);
-        return _isSuccess = true;
+        return true;
       },
     );
     return navi;
