@@ -1,5 +1,6 @@
 import 'package:flutx_core/flutx_core.dart';
 import 'package:get/get.dart';
+
 import '../../../../core/base/base_controller.dart';
 import '../../../../core/network/services/auth_storage_service.dart';
 import '../../../../core/services/get_user_profile_service.dart';
