@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 
-
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/constants/api_constants.dart';
 import '../../../../core/network/network_result.dart';
@@ -19,6 +18,15 @@ class UserInfoRepoImpl implements UserInfoRepo {
       data: formData,
       fromJsonT: (json) => UserInfoResponseModel.fromJson(json),
       // isFormData: true
+    );
+  }
+
+  @override
+  NetworkResult<Map<String, dynamic>> deleteAccount(String userId) {
+    final endpoint = ApiConstants.user.deleteAccount(userId);
+    return _apiClient.delete<Map<String, dynamic>>(
+      endpoint,
+      fromJsonT: (json) => json as Map<String, dynamic>,
     );
   }
 }
