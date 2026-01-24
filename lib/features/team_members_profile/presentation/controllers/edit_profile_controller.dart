@@ -31,7 +31,10 @@ class EditProfileController extends GetxController {
       if (birthday.trim().isNotEmpty) {
         final isoBirthday = _convertBirthdayToIso(birthday.trim());
         if (isoBirthday == null) {
-          Get.snackbar('Invalid birthday', 'Please enter birthday in DD/MM/YYYY format');
+          Get.snackbar(
+            'Invalid birthday',
+            'Please enter birthday in DD/MM/YYYY format',
+          );
           return false;
         }
         manager.addTextData('birthday', isoBirthday);
@@ -43,25 +46,57 @@ class EditProfileController extends GetxController {
       final formData = await manager.toFormDataWithValidation();
 
       if (image != null) {
-        formData.files.add(MapEntry(
-          'image',
-          await dio.MultipartFile.fromFile(
-            image.path,
-            filename: image.path.split('/').last,
+        formData.files.add(
+          MapEntry(
+            'image',
+            await dio.MultipartFile.fromFile(
+              image.path,
+              filename: image.path.split('/').last,
+            ),
           ),
-        ));
+        );
       }
 
       final result = await _repo.updateprofile(formData);
 
       bool success = false;
-      result.fold((failure) {
-        Get.snackbar('Error', failure.message);
-        success = false;
-      }, (suc) {
-        Get.snackbar('Success', suc.message);
-        success = true;
-      });
+      result.fold(
+        (failure) {
+          Get.snackbar('Error', failure.message);
+          success = false;
+        },
+        (suc) {
+          Get.snackbar('Success', suc.message);
+          success = true;
+        },
+      );
+
+      return success;
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> deleteAccount(String userId) async {
+    try {
+      isLoading.value = true;
+
+      final result = await _repo.deleteAccount(userId);
+
+      bool success = false;
+      result.fold(
+        (failure) {
+          Get.snackbar('Error', failure.message);
+          success = false;
+        },
+        (suc) {
+          Get.snackbar('Success', 'Account deleted successfully');
+          success = true;
+        },
+      );
 
       return success;
     } catch (e) {
@@ -89,7 +124,21 @@ class EditProfileController extends GetxController {
       if (year < 1900 || year > 2100) return null;
       if (month < 1 || month > 12) return null;
 
-      final daysInMonth = <int>[0, 31, _isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      final daysInMonth = <int>[
+        0,
+        31,
+        _isLeapYear(year) ? 29 : 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
+      ];
       if (day < 1 || day > daysInMonth[month]) return null;
 
       final mm = month.toString().padLeft(2, '0');
