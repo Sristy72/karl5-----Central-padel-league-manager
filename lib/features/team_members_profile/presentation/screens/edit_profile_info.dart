@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../data/models/edit_profile_model.dart';
 import '../../data/models/team_member_model.dart';
+import '../../../auth/presentation/controller/auth_controller.dart';
 import '../controllers/edit_profile_controller.dart';
 import '../controllers/profile_controller.dart';
 import 'profile_info_screen.dart';
@@ -42,8 +43,6 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
     });
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -55,11 +54,12 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
     _controller = Get.find<EditProfileController>();
     _profileController = Get.find<ProfileController>();
     // prefer profile values when available for initial hinting
-    _selectedGender = _profileController.profile.value?.gender ?? widget.member.gender;
+    _selectedGender =
+        _profileController.profile.value?.gender ?? widget.member.gender;
 
     // Set email from profile controller (uneditable)
     _emailController = TextEditingController(
-        text: _profileController.profile.value?.email ?? widget.member.email
+      text: _profileController.profile.value?.email ?? widget.member.email,
     );
   }
 
@@ -89,7 +89,8 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
             colorScheme: const ColorScheme.dark(
               primary: Colors.blue,
               onSurface: Colors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: Colors.black),
+            ),
+            dialogTheme: DialogThemeData(backgroundColor: Colors.black),
           ),
           child: child!,
         );
@@ -99,7 +100,7 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
     if (pickedDate != null) {
       setState(() {
         _birthdayController.text =
-        "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+            "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
       });
     }
   }
@@ -167,8 +168,12 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-          const EdgeInsets.only(top: 22, left: 24, right: 24, bottom: 24),
+          padding: const EdgeInsets.only(
+            top: 22,
+            left: 24,
+            right: 24,
+            bottom: 24,
+          ),
           child: Column(
             children: [
               // Profile Image with picker
@@ -177,25 +182,35 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                 child: Stack(
                   alignment: Alignment.bottomRight,
                   children: [
-                    Builder(builder: (_) {
-                      final profileImg = _profileController.profile.value?.profileImage ?? '';
-                      final fallback = widget.member.imageUrl;
-                      ImageProvider display;
-                      if (_pickedImage != null) {
-                        display = FileImage(_pickedImage!);
-                      } else if (profileImg.isNotEmpty) {
-                        display = profileImg.startsWith('http') ? NetworkImage(profileImg) : AssetImage(profileImg);
-                      } else if (fallback.isNotEmpty) {
-                        display = fallback.startsWith('http') ? NetworkImage(fallback) : AssetImage(fallback);
-                      } else {
-                        display = const AssetImage('assets/images/profile.png');
-                      }
+                    Builder(
+                      builder: (_) {
+                        final profileImg =
+                            _profileController.profile.value?.profileImage ??
+                            '';
+                        final fallback = widget.member.imageUrl;
+                        ImageProvider display;
+                        if (_pickedImage != null) {
+                          display = FileImage(_pickedImage!);
+                        } else if (profileImg.isNotEmpty) {
+                          display = profileImg.startsWith('http')
+                              ? NetworkImage(profileImg)
+                              : AssetImage(profileImg);
+                        } else if (fallback.isNotEmpty) {
+                          display = fallback.startsWith('http')
+                              ? NetworkImage(fallback)
+                              : AssetImage(fallback);
+                        } else {
+                          display = const AssetImage(
+                            'assets/images/profile.png',
+                          );
+                        }
 
-                      return CircleAvatar(
-                        radius: 55,
-                        backgroundImage: display,
-                      );
-                    }),
+                        return CircleAvatar(
+                          radius: 55,
+                          backgroundImage: display,
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -207,9 +222,19 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                   Expanded(
                     child: _buildTextField(
                       label: "First Name",
-                      hintText: (_profileController.profile.value?.name != null && _profileController.profile.value!.name!.isNotEmpty)
-                          ? _profileController.profile.value!.name!.split(' ').first
-                          : (widget.member.firstName.isNotEmpty ? widget.member.firstName : 'First Name'),
+                      hintText:
+                          (_profileController.profile.value?.name != null &&
+                              _profileController
+                                  .profile
+                                  .value!
+                                  .name!
+                                  .isNotEmpty)
+                          ? _profileController.profile.value!.name!
+                                .split(' ')
+                                .first
+                          : (widget.member.firstName.isNotEmpty
+                                ? widget.member.firstName
+                                : 'First Name'),
                       controller: _firstNameController,
                     ),
                   ),
@@ -217,9 +242,24 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                   Expanded(
                     child: _buildTextField(
                       label: "Last Name",
-                      hintText: (_profileController.profile.value?.name != null && _profileController.profile.value!.name!.isNotEmpty && _profileController.profile.value!.name!.split(' ').length > 1)
-                          ? _profileController.profile.value!.name!.split(' ').sublist(1).join(' ')
-                          : (widget.member.lastName.isNotEmpty ? widget.member.lastName : 'Last Name'),
+                      hintText:
+                          (_profileController.profile.value?.name != null &&
+                              _profileController
+                                  .profile
+                                  .value!
+                                  .name!
+                                  .isNotEmpty &&
+                              _profileController.profile.value!.name!
+                                      .split(' ')
+                                      .length >
+                                  1)
+                          ? _profileController.profile.value!.name!
+                                .split(' ')
+                                .sublist(1)
+                                .join(' ')
+                          : (widget.member.lastName.isNotEmpty
+                                ? widget.member.lastName
+                                : 'Last Name'),
                       controller: _lastNameController,
                     ),
                   ),
@@ -239,9 +279,13 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
               // Phone
               _buildTextField(
                 label: "Phone",
-                hintText: _profileController.profile.value?.phoneNumber?.isNotEmpty == true
+                hintText:
+                    _profileController.profile.value?.phoneNumber?.isNotEmpty ==
+                        true
                     ? _profileController.profile.value!.phoneNumber!
-                    : (widget.member.phone.isNotEmpty ? widget.member.phone : 'Enter Phone Number'),
+                    : (widget.member.phone.isNotEmpty
+                          ? widget.member.phone
+                          : 'Enter Phone Number'),
                 controller: _phoneController,
               ),
               const SizedBox(height: 16),
@@ -253,9 +297,10 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                   const Text(
                     "Birthday",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400),
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   SizedBox(
@@ -264,15 +309,20 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                       controller: _birthdayController,
                       readOnly: true,
                       onTap: _selectDate,
-                      style:
-                      const TextStyle(color: Colors.white, fontSize: 14),
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: widget.member.birthday.isNotEmpty ? widget.member.birthday : '29/02/2000',
+                        hintText: widget.member.birthday.isNotEmpty
+                            ? widget.member.birthday
+                            : '29/02/2000',
                         hintStyle: const TextStyle(
-                            color: Color(0xFF7D807D), fontSize: 16),
+                          color: Color(0xFF7D807D),
+                          fontSize: 16,
+                        ),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: const BorderSide(color: Colors.white),
                           borderRadius: BorderRadius.circular(4),
@@ -306,9 +356,10 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                   const Text(
                     "Gender",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400),
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   SizedBox(
@@ -316,19 +367,26 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                     child: DropdownButtonFormField<String>(
                       initialValue: null,
                       hint: Text(
-                        _profileController.profile.value?.gender?.isNotEmpty == true
+                        _profileController.profile.value?.gender?.isNotEmpty ==
+                                true
                             ? _profileController.profile.value!.gender!
-                            : (widget.member.gender.isNotEmpty ? widget.member.gender : 'Select'),
+                            : (widget.member.gender.isNotEmpty
+                                  ? widget.member.gender
+                                  : 'Select'),
                         style: const TextStyle(color: Colors.white),
                       ),
                       dropdownColor: Colors.black,
                       style: const TextStyle(color: Colors.white, fontSize: 14),
-                      icon: const Icon(Icons.keyboard_arrow_down_sharp,
-                          color: Color(0xFF7D807D)),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down_sharp,
+                        color: Color(0xFF7D807D),
+                      ),
                       decoration: InputDecoration(
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: const BorderSide(color: Colors.white),
                           borderRadius: BorderRadius.circular(4),
@@ -341,12 +399,15 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                         filled: true,
                       ),
                       items: ["Male", "Female", "Other"]
-                          .map((gender) => DropdownMenuItem(
-                        value: gender,
-                        child: Text(gender,
-                            style:
-                            const TextStyle(color: Colors.white)),
-                      ))
+                          .map(
+                            (gender) => DropdownMenuItem(
+                              value: gender,
+                              child: Text(
+                                gender,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          )
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -369,7 +430,9 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 10),
+                        horizontal: 32,
+                        vertical: 10,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -389,23 +452,40 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
 
                       final firstName = rawFirst.isNotEmpty
                           ? rawFirst
-                          : (profileVal?.name?.split(' ').first ?? (widget.member.firstName.isNotEmpty ? widget.member.firstName : ''));
+                          : (profileVal?.name?.split(' ').first ??
+                                (widget.member.firstName.isNotEmpty
+                                    ? widget.member.firstName
+                                    : ''));
 
                       final lastName = rawLast.isNotEmpty
                           ? rawLast
-                          : ((profileVal?.name != null && (profileVal!.name!.split(' ').length > 1))
-                              ? profileVal.name!.split(' ').sublist(1).join(' ')
-                              : (widget.member.lastName.isNotEmpty ? widget.member.lastName : ''));
+                          : ((profileVal?.name != null &&
+                                    (profileVal!.name!.split(' ').length > 1))
+                                ? profileVal.name!
+                                      .split(' ')
+                                      .sublist(1)
+                                      .join(' ')
+                                : (widget.member.lastName.isNotEmpty
+                                      ? widget.member.lastName
+                                      : ''));
 
                       final phone = rawPhone.isNotEmpty
                           ? rawPhone
-                          : (profileVal?.phoneNumber ?? (widget.member.phone.isNotEmpty ? widget.member.phone : ''));
+                          : (profileVal?.phoneNumber ??
+                                (widget.member.phone.isNotEmpty
+                                    ? widget.member.phone
+                                    : ''));
                       final birthday = rawBirthday.isNotEmpty
                           ? rawBirthday
-                          : (widget.member.birthday.isNotEmpty ? widget.member.birthday : '');
+                          : (widget.member.birthday.isNotEmpty
+                                ? widget.member.birthday
+                                : '');
                       final gender = rawGender.isNotEmpty
                           ? rawGender
-                          : (profileVal?.gender ?? (widget.member.gender.isNotEmpty ? widget.member.gender : ''));
+                          : (profileVal?.gender ??
+                                (widget.member.gender.isNotEmpty
+                                    ? widget.member.gender
+                                    : ''));
 
                       // Validation: require at least one of first or last name.
                       if (firstName.isEmpty && lastName.isEmpty) {
@@ -444,9 +524,15 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                         final updated = profileCtrl.profile.value;
                         final memberModel = TeamMemberModel(
                           id: updated?.id ?? '',
-                          name: updated?.name ?? [firstName, lastName].where((s) => s.isNotEmpty).join(' '),
+                          name:
+                              updated?.name ??
+                              [
+                                firstName,
+                                lastName,
+                              ].where((s) => s.isNotEmpty).join(' '),
                           role: updated?.role ?? '',
-                          imageUrl: updated?.profileImage ?? widget.member.imageUrl,
+                          imageUrl:
+                              updated?.profileImage ?? widget.member.imageUrl,
                           matches: 0,
                           level: int.tryParse(updated?.playingLevel ?? '') ?? 1,
                           firstName: firstName,
@@ -466,6 +552,93 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
                       "Save",
                       style: TextStyle(
                         color: Color(0xFF060606),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Delete Account Button
+              Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  height: 39,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () async {
+                      // Show confirmation dialog
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: Colors.grey[900],
+                          title: const Text(
+                            'Delete Account',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          content: const Text(
+                            'Are you sure you want to delete your account? This action cannot be undone.',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirmed == true) {
+                        // Get user ID from profile
+                        final userId = _profileController.profile.value?.id;
+
+                        if (userId == null || userId.isEmpty) {
+                          Get.snackbar(
+                            'Error',
+                            'Unable to delete account. User ID not found.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                          return;
+                        }
+
+                        // Call delete account API
+                        final success = await _controller.deleteAccount(userId);
+
+                        if (success) {
+                          // Clear auth data and navigate to login
+                          final authController = Get.find<AuthController>();
+                          await authController.logout();
+                        }
+                      }
+                    },
+                    child: const Text(
+                      "Delete Account",
+                      style: TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -494,9 +667,10 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
         Text(
           label,
           style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w400),
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         const SizedBox(height: 4),
         SizedBox(
@@ -506,22 +680,30 @@ class _EditProfileInfoScreenState extends State<EditProfileInfoScreen> {
             initialValue: controller == null ? initialValue : null,
             enabled: enabled,
             style: TextStyle(
-                color: enabled ? Colors.white : Colors.grey,
-                fontSize: 14
+              color: enabled ? Colors.white : Colors.grey,
+              fontSize: 14,
             ),
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: const TextStyle(
-                  color: Color(0xFF7D807D), fontSize: 16),
+                color: Color(0xFF7D807D),
+                fontSize: 16,
+              ),
               isDense: true,
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: enabled ? Colors.white : Colors.grey),
+                borderSide: BorderSide(
+                  color: enabled ? Colors.white : Colors.grey,
+                ),
                 borderRadius: BorderRadius.circular(4),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: enabled ? Colors.white : Colors.grey),
+                borderSide: BorderSide(
+                  color: enabled ? Colors.white : Colors.grey,
+                ),
                 borderRadius: BorderRadius.circular(4),
               ),
               disabledBorder: OutlineInputBorder(
