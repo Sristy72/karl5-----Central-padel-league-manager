@@ -2,7 +2,7 @@ class ApiConstants {
   /// [Base Configuration]
   // static const String baseDomain = 'https://karlfive223-backend.onrender.com';
   // static const String baseDomain = 'http://72.61.161.196';
-  static const String baseDomain = 'http://72.61.161.196';
+  static const String baseDomain = 'https://api.centralpadelleague.com';
 
   static const String baseUrl = '$baseDomain/api/v1';
 
@@ -29,7 +29,6 @@ class ApiConstants {
   static NotificationEndpoints get notification => NotificationEndpoints();
   static ReportEndpoints get report => ReportEndpoints();
 
-
   static get team => null;
 
   static get league => null;
@@ -52,6 +51,7 @@ class UserEndpoints {
   static const String _base = '${ApiConstants.baseUrl}/user';
   final String updateProfile = '$_base/update-profile';
   final String getUserProfile = '$_base/profile';
+  String deleteAccount(String userId) => '$_base/$userId';
 
   // final String create = '$_base/create';
 }
@@ -60,7 +60,7 @@ class NotificationEndpoints {
   static const String _base = '${ApiConstants.baseUrl}/notification';
 
   final String getnotifications = '$_base/getnotifications';
-  
+
   String getNotificationsByUserId(String userId) => '$_base/$userId';
 }
 
@@ -78,5 +78,3 @@ class ReportEndpoints {
   /// Optional — in case backend supports fetching user reports later
   final String getReports = '$_base/all';
 }
-
-
