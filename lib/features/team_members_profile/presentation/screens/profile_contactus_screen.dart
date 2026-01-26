@@ -73,13 +73,13 @@ class ProfileContactUsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              // Phone
-              _buildTextField(
-                label: "Phone Number",
-                hintText: "Enter Phone Number",
-                controller: phoneNumberController,
-              ),
-              const SizedBox(height: 10),
+              // // Phone
+              // _buildTextField(
+              //   label: "Phone Number",
+              //   hintText: "Enter Phone Number",
+              //   controller: phoneNumberController,
+              // ),
+              // const SizedBox(height: 10),
 
               // Subject
               _buildTextField(
@@ -142,7 +142,7 @@ class ProfileContactUsScreen extends StatelessWidget {
 
                     // WhatsApp (Phone)
                     GestureDetector(
-                      onTap: () => _launchWhatsApp('+447353129595'),
+                      // onTap: () => _launchWhatsApp('+447353129595'),
                       child: Row(
                         children: [
                           Image.asset(

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/utils.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../features/Create_league/presentation/widgets/private_league_code_dialog.dart';
@@ -85,25 +83,26 @@ class CustomLeagueAppbar extends StatelessWidget
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: AppColors.white.withValues(alpha: 0.3),
-                        ),
-                        child: const Image(
-                          height: 22,
-                          width: 22,
-                          image: AssetImage("assets/images/cross_icon.png"),
-                          color: AppColors.white,
-                        ),
-                      ),
-                      onPressed: () {
-                        Get.back();
-                      },
-                    ),
+                    // IconButton(
+                    //   icon: Container(
+                    //     padding: const EdgeInsets.all(4),
+                    //     decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.circular(4),
+                    //       color: AppColors.white.withValues(alpha: 0.3),
+                    //     ),
+                    //     child: const Image(
+                    //       height: 22,
+                    //       width: 22,
+                    //       image: AssetImage("assets/images/cross_icon.png"),
+                    //       color: AppColors.white,
+                    //     ),
+                    //   ),
+                    //   onPressed: () {
+                    //     Get.back();
+                    //   },
+                    // ),
                     //! Share icon
+                    Spacer(),
                     if (leagueCode != null && leagueCode!.isNotEmpty)
                       IconButton(
                         icon: const Icon(

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutx_core/flutx_core.dart';
 import 'package:get/get.dart';
 
@@ -46,11 +47,27 @@ class AuthController extends BaseController {
             refreshToken: success.data.refreshToken,
             userId: success.data.user.id,
           );
+
+          setLoading(false);
+
+          // Show success message
+          Get.snackbar(
+            'Success',
+            'Welcome back, ${user.name}!',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Get.theme.primaryColor,
+            colorText: Colors.white,
+            duration: Duration(seconds: 2),
+          );
+
+          // Small delay to let user see the success message
+          await Future.delayed(Duration(milliseconds: 500));
+
           Get.to(HomeScreen());
         } else {
           setError(success.message);
+          setLoading(false);
         }
-        setLoading(false);
       },
     );
   }
@@ -89,12 +106,28 @@ class AuthController extends BaseController {
             refreshToken: success.data.refreshToken,
             userId: success.data.user.id,
           );
+
+          setLoading(false);
+
+          // Show success message
+          Get.snackbar(
+            'Success',
+            'Account created successfully! Welcome ${user.name}',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Get.theme.primaryColor,
+            colorText: Colors.white,
+            duration: Duration(seconds: 2),
+          );
+
+          // Small delay to let user see the success message
+          await Future.delayed(Duration(milliseconds: 500));
+
           // Navigate to home screen
           Get.offAll(() => HomeScreen());
         } else {
           setError('Registration is only available for managers');
+          setLoading(false);
         }
-        setLoading(false);
       },
     );
   }

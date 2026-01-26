@@ -198,34 +198,34 @@ class ProfileInfoScreen extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/icons/profile_phone.png',
-                            width: 11,
-                            height: 11,
-                          ),
-                          const SizedBox(width: 14),
-                          const Text(
-                            "Phone number",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const Spacer(),
-                          Obx(() {
-                            final p = controller.profile.value;
-                            return Text(
-                              p?.phoneNumber ?? member.phone,
-                              style: const TextStyle(color: Colors.white),
-                            );
-                          }),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.start,
+                      //   children: [
+                      //     Image.asset(
+                      //       'assets/icons/profile_phone.png',
+                      //       width: 11,
+                      //       height: 11,
+                      //     ),
+                      //     const SizedBox(width: 14),
+                      //     const Text(
+                      //       "Phone number",
+                      //       style: TextStyle(
+                      //         color: Colors.white,
+                      //         fontWeight: FontWeight.w400,
+                      //         fontSize: 16,
+                      //       ),
+                      //     ),
+                      //     const Spacer(),
+                      //     Obx(() {
+                      //       final p = controller.profile.value;
+                      //       return Text(
+                      //         p?.phoneNumber ?? member.phone,
+                      //         style: const TextStyle(color: Colors.white),
+                      //       );
+                      //     }),
+                      //   ],
+                      // ),
+                      // const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
